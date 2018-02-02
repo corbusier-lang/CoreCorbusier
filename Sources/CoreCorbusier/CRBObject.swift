@@ -7,9 +7,8 @@
 
 public protocol CRBObject : AnyObject {
     
-    func isAnchorSupported(_ anchor: CRBAnchorName) -> Bool
-    func point(of anchor: CRBAnchorName) -> CRBPoint
-    func normalizedVector(for anchor: CRBAnchorName) -> CRBNormalizedVector
+    func isAnchorSupported(anchorName: CRBAnchorName) -> Bool
+    func anchor(with name: CRBAnchorName) -> CRBAnchor?
     
 }
 
