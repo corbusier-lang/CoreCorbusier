@@ -7,6 +7,22 @@
 
 public protocol CRBInstance : AnyObject { }
 
+public typealias CRBInstanceName = Name<CRBInstance>
+
+public final class CRBPlacementGuideInstance : CRBInstance {
+    
+    public let objectToPlace: CRBObject
+    public let anchorKeyPath: CRBAnchorKeyPath
+    public let pointToPlace: CRBPoint
+    
+    public init(objectToPlace : CRBObject, anchorName: CRBAnchorKeyPath, pointToPlace: CRBPoint) {
+        self.objectToPlace = objectToPlace
+        self.anchorKeyPath = anchorName
+        self.pointToPlace = pointToPlace
+    }
+    
+}
+
 public enum WrongTypeError : Error {
     case wrongType(expectedType: CRBInstance.Type, instance: CRBInstance)
 }
@@ -16,20 +32,4 @@ internal func downcast<InstanceType : CRBInstance>(_ instance: CRBInstance, to i
         return downcasted
     }
     throw WrongTypeError.wrongType(expectedType: instanceType, instance: instance)
-}
-
-public typealias CRBInstanceName = Name<CRBInstance>
-
-public final class CRBPlacementGuideInstance : CRBInstance {
-    
-    public let objectToPlace: CRBObject
-    public let anchorName: CRBAnchorName
-    public let pointToPlace: CRBPoint
-    
-    public init(objectToPlace : CRBObject, anchorName: CRBAnchorName, pointToPlace: CRBPoint) {
-        self.objectToPlace = objectToPlace
-        self.anchorName = anchorName
-        self.pointToPlace = pointToPlace
-    }
-    
 }

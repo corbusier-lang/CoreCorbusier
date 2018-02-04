@@ -26,11 +26,11 @@ public struct CRBPlaceExpression {
     
     public struct ObjectAnchor {
         public let objectName: CRBObjectName
-        public let anchorName: CRBAnchorName
+        public let anchorKeyPath: CRBAnchorKeyPath
         
-        public init(objectName: CRBObjectName, anchorName: CRBAnchorName) {
+        public init(objectName: CRBObjectName, anchorKeyPath: CRBAnchorKeyPath) {
             self.objectName = objectName
-            self.anchorName = anchorName
+            self.anchorKeyPath = anchorKeyPath
         }
     }
     

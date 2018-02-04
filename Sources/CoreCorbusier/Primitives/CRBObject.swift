@@ -7,17 +7,17 @@
 
 public protocol CRBObject : CRBInstance {
     
-    func isAnchorSupported(anchorName: CRBAnchorName) -> Bool
+    func isAnchorSupported(anchorName: CRBAnchorKeyPath) -> Bool
 
     var state: CRBObjectState { get }
     
-    func place(at point: CRBPoint, fromAnchorWith name: CRBAnchorName)
+    func place(at point: CRBPoint, fromAnchorWith keyPath: CRBAnchorKeyPath)
     
 }
 
 extension CRBObject {
     
-    public func placed() throws -> CRBPlacedObjectTrait {
+    public func placed() throws -> CRBAnchorEnvironment {
         if case .placed(let pl) = state {
             return pl
         }
@@ -39,7 +39,7 @@ extension CRBObject {
 
 public enum CRBObjectState {
     
-    case placed(CRBPlacedObjectTrait)
+    case placed(CRBAnchorEnvironment)
     case unplaced
     
     enum Error : Swift.Error {
@@ -49,18 +49,28 @@ public enum CRBObjectState {
     
 }
 
-public protocol CRBPlacedObjectTrait {
+public protocol CRBAnchorEnvironment {
     
     func anchor(with name: CRBAnchorName) -> CRBAnchor?
     
 }
 
-extension CRBAnchor {
+extension CRBAnchorEnvironment {
     
-    public func placePoint(distance: CRBFloat) -> CRBPoint {
-        let distancedVector = self.normalizedVector.asVector().multiplied(byScalar: distance)
-        return self.point.shifted(with: distancedVector)
+    public func anchor(at keyPath: CRBAnchorKeyPath) -> CRBAnchor? {
+        var currentEnv: CRBAnchorEnvironment = self
+        var keyPath = keyPath
+        let lastName = keyPath.popLast()!
+        for name in keyPath {
+            if let deeper = currentEnv.anchor(with: name) {
+                currentEnv = deeper
+            } else {
+                return nil
+            }
+        }
+        return currentEnv.anchor(with: lastName)
     }
+
     
 }
 

@@ -5,38 +5,33 @@
 //  Created by Олег on 01.02.2018.
 //
 
-public struct Name<T> : RawRepresentable, Hashable {
-    
-    public var hashValue: Int {
-        return rawValue.hashValue
-    }
-    
-    public var rawValue: String
-    
-    public init(rawValue: String) {
-        self.rawValue = rawValue
-    }
-    
-}
-
-public func crbname<T, V>(_ converted: Name<V>) -> Name<T> {
-    return Name<T>(rawValue: converted.rawValue)
-}
-
-public func crbname<T>(_ rawName: String) -> Name<T> {
-    return Name<T>(rawValue: rawName)
-}
-
 public typealias CRBAnchorName = Name<CRBAnchor>
+public typealias CRBAnchorKeyPath = [CRBAnchorName]
 
-public struct CRBAnchor {
+public struct CRBAnchor : CRBAnchorEnvironment {
+    
+    let child: CRBAnchorEnvironment?
     
     public var point: CRBPoint
     public var normalizedVector: CRBNormalizedVector
     
-    public init(point: CRBPoint, normalizedVector: CRBNormalizedVector) {
+    public init(point: CRBPoint, normalizedVector: CRBNormalizedVector, child: CRBAnchorEnvironment? = nil) {
         self.point = point
         self.normalizedVector = normalizedVector
+        self.child = child
+    }
+    
+    public func anchor(with name: CRBAnchorName) -> CRBAnchor? {
+        return child?.anchor(with: name)
+    }
+    
+}
+
+extension CRBAnchor {
+    
+    public func placePoint(distance: CRBFloat) -> CRBPoint {
+        let distancedVector = self.normalizedVector.asVector().multiplied(byScalar: distance)
+        return self.point.shifted(with: distancedVector)
     }
     
 }

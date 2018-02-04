@@ -7,6 +7,7 @@
 
 public enum CRBStatement {
     
+    case ordered([CRBStatement])
     case assign(CRBInstanceName, CRBExpression)
     case place(CRBExpression)
     case unused(CRBExpression)

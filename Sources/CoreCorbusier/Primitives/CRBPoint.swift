@@ -19,6 +19,10 @@ public struct CRBPoint {
         return CRBPoint(x: self.x + vector.dx, y: self.y + vector.dy)
     }
     
+    public static func between(_ p1: CRBPoint, _ p2: CRBPoint, multiplier: CRBFloat) -> CRBPoint {
+        return CRBPoint(x: (p1.x + p2.x) * multiplier, y: (p1.y + p2.y) * multiplier)
+    }
+    
 }
 
 extension CRBPoint : Hashable {
