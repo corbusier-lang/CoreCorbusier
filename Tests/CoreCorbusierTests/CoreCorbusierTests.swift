@@ -1,26 +1,63 @@
 import XCTest
 @testable import CoreCorbusier
 
-class Rect : CRBObject {
+class RectObject : CRBObject {
     
-    private let rect: CGRect
+    fileprivate enum Anchors : String {
+        case top
+        case bottom
+    }
+    
+    fileprivate enum PlaceAnchor : String {
+        case topLeft
+    }
+    
+    var state: CRBObjectState
+    fileprivate let size: CGSize
+    
+    init(size: CGSize) {
+        self.size = size
+        self.state = .unplaced
+    }
+    
+    init(rect: CGRect) {
+        self.size = rect.size
+        let rect = Rect(rect: rect)
+        self.state = .placed(rect)
+    }
+    
+    func place(at point: CRBPoint, fromAnchorWith name: CRBAnchorName) {
+        let anchor = PlaceAnchor(rawValue: name.rawValue)!
+        let cgrect: CGRect
+        switch anchor {
+        case .topLeft:
+            cgrect = CGRect(origin: CGPoint.init(x: point.x, y: point.y),
+                            size: self.size)
+        }
+        let rect = Rect(rect: cgrect)
+        self.state = .placed(rect)
+    }
+    
+    func isAnchorSupported(anchorName: CRBAnchorName) -> Bool {
+        if isUnplaced {
+            return PlaceAnchor(rawValue: anchorName.rawValue) != nil
+        } else {
+            return Anchors(rawValue: anchorName.rawValue) != nil
+        }
+    }
+    
+}
+
+class Rect : CRBPlacedObjectTrait {
+    
+    fileprivate let rect: CGRect
     
     init(rect: CGRect) {
         self.rect = rect
     }
     
-    private enum Anchors : String {
-        case top
-        case bottom
-    }
-    
-    func isAnchorSupported(anchorName anchor: CRBAnchorName) -> Bool {
-        let anch = Anchors(rawValue: anchor.rawValue)
-        return !(anch == nil)
-    }
-    
     func anchor(with name: CRBAnchorName) -> CRBAnchor? {
-        guard let anch = Anchors(rawValue: name.rawValue) else {
+        guard let anch = RectObject.Anchors(rawValue: name.rawValue) else {
             return nil
         }
         switch anch {
@@ -41,24 +78,42 @@ class CoreCorbusierTests: XCTestCase {
     
     func testCGRect() {
         let cgrect = CGRect(x: 20, y: 20, width: 40, height: 40)
-        let rect = Rect(rect: cgrect)
+        let rect = RectObject(rect: cgrect)
         let bottomAnchorName = CRBAnchorName(rawValue: "bottom")
         XCTAssertTrue(rect.isAnchorSupported(anchorName: bottomAnchorName))
-        let bottomAnchor = rect.anchor(with: bottomAnchorName)!
+        let placed = try! rect.placed()
+        let bottomAnchor = placed.anchor(with: bottomAnchorName)!
         let bottomPoint = bottomAnchor.point
         let bottomVector = bottomAnchor.normalizedVector
         print(bottomPoint, bottomVector)
         
         let topAnchorName = CRBAnchorName(rawValue: "top")
         XCTAssertTrue(rect.isAnchorSupported(anchorName: topAnchorName))
-        let topAnchor = rect.anchor(with: topAnchorName)!
+        let topAnchor = placed.anchor(with: topAnchorName)!
         let topPoint = topAnchor.point
         let topVector = topAnchor.normalizedVector
         print(topPoint, topVector)
         
         let unexistingAnchor = CRBAnchorName(rawValue: "unreal")
         XCTAssertFalse(rect.isAnchorSupported(anchorName: unexistingAnchor))
-        XCTAssertNil(rect.anchor(with: unexistingAnchor))
+        XCTAssertNil(placed.anchor(with: unexistingAnchor))
+    }
+    
+    func testExecute() throws {
+        let first = RectObject(rect: CGRect(x: 0, y: 0, width: 40, height: 40))
+        let unplaced = RectObject(size: CGSize(width: 30, height: 30))
+        var context = CRBContext()
+        context.objectsMap = [
+            crbname("first") : first,
+            crbname("unplaced") : unplaced,
+        ]
+        var executor = CRBExecution(context: context)
+        let firstObjectAnchor = CRBPlaceExpression.ObjectAnchor(objectName: crbname("first"), anchorName: crbname("bottom"))
+        let unplacedObjectAnchor = CRBPlaceExpression.ObjectAnchor(objectName: crbname("unplaced"), anchorName: crbname("topLeft"))
+        let placeExpression = CRBPlaceExpression(toPlace: unplacedObjectAnchor, distance: 10, anchorPointToPlaceFrom: .ofObject(firstObjectAnchor))
+        let placeUnplaced = CRBExpression.place(placeExpression)
+        try executor.execute(expression: placeUnplaced)
+        print(try (unplaced.placed() as! Rect).rect)
     }
 
 }

@@ -15,6 +15,10 @@ public struct CRBPoint {
         self.y = y
     }
     
+    public func shifted(with vector: CRBVector) -> CRBPoint {
+        return CRBPoint(x: self.x + vector.dx, y: self.y + vector.dy)
+    }
+    
 }
 
 extension CRBPoint : Hashable {

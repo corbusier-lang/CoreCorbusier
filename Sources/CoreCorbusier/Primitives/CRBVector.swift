@@ -33,6 +33,10 @@ public struct CRBVector {
         return CRBNormalizedVector(alreadyNormalizedVector: self)
     }
     
+    public func multiplied(byScalar scalarMult: CRBFloat) -> CRBVector {
+        return CRBVector(dx: self.dx * scalarMult, dy: self.dy * scalarMult)
+    }
+    
 }
 
 public struct CRBNormalizedVector {

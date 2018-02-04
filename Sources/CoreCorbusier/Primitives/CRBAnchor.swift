@@ -5,7 +5,7 @@
 //  Created by Олег on 01.02.2018.
 //
 
-public struct CRBAnchorName : RawRepresentable, Hashable {
+public struct Name<T> : RawRepresentable, Hashable {
     
     public var hashValue: Int {
         return rawValue.hashValue
@@ -18,6 +18,12 @@ public struct CRBAnchorName : RawRepresentable, Hashable {
     }
     
 }
+
+public func crbname<T>(_ rawName: String) -> Name<T> {
+    return Name<T>(rawValue: rawName)
+}
+
+public typealias CRBAnchorName = Name<CRBAnchor>
 
 public struct CRBAnchor {
     
