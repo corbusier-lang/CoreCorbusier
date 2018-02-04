@@ -7,7 +7,7 @@
 
 public enum CRBExpression {
     
-    case place(CRBPlaceExpression)
+    case placement(CRBPlaceExpression)
     
 }
 

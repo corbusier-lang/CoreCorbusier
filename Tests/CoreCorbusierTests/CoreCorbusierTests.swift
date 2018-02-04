@@ -111,8 +111,9 @@ class CoreCorbusierTests: XCTestCase {
         let firstObjectAnchor = CRBPlaceExpression.ObjectAnchor(objectName: crbname("first"), anchorName: crbname("bottom"))
         let unplacedObjectAnchor = CRBPlaceExpression.ObjectAnchor(objectName: crbname("unplaced"), anchorName: crbname("topLeft"))
         let placeExpression = CRBPlaceExpression(toPlace: unplacedObjectAnchor, distance: 10, anchorPointToPlaceFrom: .ofObject(firstObjectAnchor))
-        let placeUnplaced = CRBExpression.place(placeExpression)
-        try executor.execute(expression: placeUnplaced)
+//        let placeUnplaced = CRBExpression.placement(placeExpression)
+        let placeStatement = CRBStatement.place(.expression(placeExpression))
+        try executor.execute(statement: placeStatement)
         print(try (unplaced.placed() as! Rect).rect)
     }
 

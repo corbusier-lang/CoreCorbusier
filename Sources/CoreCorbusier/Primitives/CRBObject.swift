@@ -5,7 +5,7 @@
 //  Created by Олег on 01.02.2018.
 //
 
-public protocol CRBObject : AnyObject {
+public protocol CRBObject : CRBInstance {
     
     func isAnchorSupported(anchorName: CRBAnchorName) -> Bool
 

@@ -29,7 +29,7 @@ public struct CRBContext {
     
 }
 
-public struct CRBExpressionExecutor {
+public struct CRBStatementExecutor {
     
     public let context: CRBContext
     
@@ -37,13 +37,23 @@ public struct CRBExpressionExecutor {
         self.context = context
     }
     
-    public func execute(expression: CRBExpression) throws {
-        switch expression {
-        case .place(let placeExpression):
-            let fromAnchor = try self.anchor(for: placeExpression.anchorPointToPlaceFrom)
-            let placePoint = fromAnchor.placePoint(distance: placeExpression.distance)
-            let objectToPlace = try context.object(with: placeExpression.toPlace.objectName)
-            objectToPlace.place(at: placePoint, fromAnchorWith: placeExpression.toPlace.anchorName)
+    public func execute(statement: CRBStatement) throws {
+        switch statement {
+        case .place(let placement):
+            switch placement {
+            case .expression(let expr):
+                let fromAnchor = try self.anchor(for: expr.anchorPointToPlaceFrom)
+                let placePoint = fromAnchor.placePoint(distance: expr.distance)
+                let objectToPlace = try context.object(with: expr.toPlace.objectName)
+                let anchorName = expr.toPlace.anchorName
+                guard objectToPlace.isAnchorSupported(anchorName: anchorName) else {
+                    throw CRBContextMiss.noAnchor(object: objectToPlace, anchorName: anchorName)
+                }
+                objectToPlace.place(at: placePoint, fromAnchorWith: expr.toPlace.anchorName)
+            }
+        case .expression(let expression):
+            print("Unused expression: \(expression) ...")
+            return
         }
     }
     
@@ -65,9 +75,9 @@ public struct CRBExecution {
         self.context = context
     }
     
-    public mutating func execute(expression: CRBExpression) throws {
-        let executor = CRBExpressionExecutor(context: context)
-        try executor.execute(expression: expression)
+    public mutating func execute(statement: CRBStatement) throws {
+        let executor = CRBStatementExecutor(context: context)
+        try executor.execute(statement: statement)
     }
         
 }
