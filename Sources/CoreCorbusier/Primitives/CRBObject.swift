@@ -17,21 +17,21 @@ public protocol CRBObject : AnyObject {
 
 extension CRBObject {
     
-    func placed() throws -> CRBPlacedObjectTrait {
+    public func placed() throws -> CRBPlacedObjectTrait {
         if case .placed(let pl) = state {
             return pl
         }
         throw CRBObjectState.Error.isUnplaced(self)
     }
     
-    var isUnplaced: Bool {
+    public var isUnplaced: Bool {
         if case .unplaced = state {
             return true
         }
         return false
     }
     
-    var isPlaced: Bool {
+    public var isPlaced: Bool {
         return !isUnplaced
     }
     
