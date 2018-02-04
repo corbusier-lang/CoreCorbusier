@@ -7,8 +7,9 @@
 
 public enum CRBStatement {
     
-    case place(Placement)
-    case expression(CRBExpression)
+    case assign(CRBInstanceName, CRBExpression)
+    case place(CRBExpression)
+    case unused(CRBExpression)
     
     public enum Placement {
         case expression(CRBPlaceExpression)

@@ -103,17 +103,33 @@ class CoreCorbusierTests: XCTestCase {
         let first = RectObject(rect: CGRect(x: 0, y: 0, width: 40, height: 40))
         let unplaced = RectObject(size: CGSize(width: 30, height: 30))
         var context = CRBContext()
-        context.objectsMap = [
+        context.instances = [
             crbname("first") : first,
             crbname("unplaced") : unplaced,
         ]
+        
         var executor = CRBExecution(context: context)
-        let firstObjectAnchor = CRBPlaceExpression.ObjectAnchor(objectName: crbname("first"), anchorName: crbname("bottom"))
-        let unplacedObjectAnchor = CRBPlaceExpression.ObjectAnchor(objectName: crbname("unplaced"), anchorName: crbname("topLeft"))
-        let placeExpression = CRBPlaceExpression(toPlace: unplacedObjectAnchor, distance: 10, anchorPointToPlaceFrom: .ofObject(firstObjectAnchor))
-//        let placeUnplaced = CRBExpression.placement(placeExpression)
-        let placeStatement = CRBStatement.place(.expression(placeExpression))
-        try executor.execute(statement: placeStatement)
+        
+        let placeUnplaced: CRBStatement = {
+            let firstObjectAnchor = CRBPlaceExpression.ObjectAnchor(objectName: crbname("first"),
+                                                                    anchorName: crbname("bottom"))
+            let unplacedObjectAnchor = CRBPlaceExpression.ObjectAnchor(objectName: crbname("unplaced"),
+                                                                       anchorName: crbname("topLeft"))
+            let placeExpression = CRBPlaceExpression(toPlace: unplacedObjectAnchor, distance: 10, anchorPointToPlaceFrom: .ofObject(firstObjectAnchor))
+            let placeUnplacedExpression = CRBExpression.placement(placeExpression)
+            return .place(placeUnplacedExpression)
+        }()
+        try executor.execute(statement: placeUnplaced)
+        
+        let assign: CRBStatement = {
+            let instanceExpression = CRBExpression.instance(crbname("unplaced"))
+            return CRBStatement.assign(crbname("assigned"), instanceExpression)
+        }()
+        try executor.execute(statement: assign)
+        
+        let object = try executor.context.object(with: crbname("assigned"))
+        dump(object)
+        
         print(try (unplaced.placed() as! Rect).rect)
     }
 

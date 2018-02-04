@@ -5,13 +5,21 @@ public struct CRBContext {
         
     }
     
-    public var objectsMap: [CRBObjectName : CRBObject] = [:]
+    public var instances: [CRBInstanceName : CRBInstance] = [:]
+    
+    public func instance(with name: CRBInstanceName) throws -> CRBInstance {
+        if let inst = instances[name] {
+            return inst
+        }
+        throw CRBContextMiss.noInstance(name)
+    }
     
     public func object(with name: CRBObjectName) throws -> CRBObject {
-        if let obj = objectsMap[name] {
+        let inst = try instance(with: crbname(name))
+        if let obj = inst as? CRBObject {
             return obj
         }
-        throw CRBContextMiss.noObject(objectName: name)
+        throw CRBContextMiss.wrongType(instanceName: crbname(name), inst)
     }
     
     public func anchor(with anchorName: CRBAnchorName, in object: CRBObject) throws -> CRBAnchor {
@@ -27,9 +35,13 @@ public struct CRBContext {
         return try anchor(with: anchorName, in: object)
     }
     
+    public func evaluate(expression: CRBExpression) throws -> CRBInstance {
+        return try CRBExpressionEvaluator(context: self).evaluate(expression: expression)
+    }
+    
 }
 
-public struct CRBStatementExecutor {
+public struct CRBExpressionEvaluator {
     
     public let context: CRBContext
     
@@ -37,23 +49,16 @@ public struct CRBStatementExecutor {
         self.context = context
     }
     
-    public func execute(statement: CRBStatement) throws {
-        switch statement {
-        case .place(let placement):
-            switch placement {
-            case .expression(let expr):
-                let fromAnchor = try self.anchor(for: expr.anchorPointToPlaceFrom)
-                let placePoint = fromAnchor.placePoint(distance: expr.distance)
-                let objectToPlace = try context.object(with: expr.toPlace.objectName)
-                let anchorName = expr.toPlace.anchorName
-                guard objectToPlace.isAnchorSupported(anchorName: anchorName) else {
-                    throw CRBContextMiss.noAnchor(object: objectToPlace, anchorName: anchorName)
-                }
-                objectToPlace.place(at: placePoint, fromAnchorWith: expr.toPlace.anchorName)
-            }
-        case .expression(let expression):
-            print("Unused expression: \(expression) ...")
-            return
+    public func evaluate(expression: CRBExpression) throws -> CRBInstance {
+        switch expression {
+        case .placement(let expr):
+            let fromAnchor = try self.anchor(for: expr.anchorPointToPlaceFrom)
+            let placePoint = fromAnchor.placePoint(distance: expr.distance)
+            let objectToPlace = try context.object(with: expr.toPlace.objectName)
+            let anchorName = expr.toPlace.anchorName
+            return CRBPlacementGuideInstance(objectToPlace: objectToPlace, anchorName: anchorName, pointToPlace: placePoint)
+        case .instance(let name):
+            return try context.instance(with: name)
         }
     }
     
@@ -62,6 +67,40 @@ public struct CRBStatementExecutor {
         case .ofObject(let objectAnchor):
             return try context.anchor(with: objectAnchor.anchorName,
                                       inObjectWith: objectAnchor.objectName)
+        }
+    }
+    
+}
+
+public struct CRBStatementExecutor {
+    
+    public init() { }
+    
+    private func evaluate<InstanceType : CRBInstance>(expression: CRBExpression,
+                                                      to instanceType: InstanceType.Type,
+                                                      in context: CRBContext) throws -> InstanceType {
+        let result = try context.evaluate(expression: expression)
+        return try downcast(result, to: instanceType)
+    }
+    
+    public func execute(statement: CRBStatement, in context: inout CRBContext) throws {
+        switch statement {
+        case .place(let expression):
+//            let fromAnchor = try self.anchor(for: expr.anchorPointToPlaceFrom)
+//            let placePoint = fromAnchor.placePoint(distance: expr.distance)
+//            let objectToPlace = try context.object(with: expr.toPlace.objectName)
+//            let anchorName = expr.toPlace.anchorName
+            let placement = try evaluate(expression: expression, to: CRBPlacementGuideInstance.self, in: context)
+            guard placement.objectToPlace.isAnchorSupported(anchorName: placement.anchorName) else {
+                throw CRBContextMiss.noAnchor(object: placement.objectToPlace, anchorName: placement.anchorName)
+            }
+            placement.objectToPlace.place(at: placement.pointToPlace, fromAnchorWith: placement.anchorName)
+        case .assign(let instanceName, let expression):
+            let instance = try context.evaluate(expression: expression)
+            context.instances[instanceName] = instance
+        case .unused(let expression):
+            print("Unused expression: \(expression) ...")
+            return
         }
     }
     
@@ -76,14 +115,16 @@ public struct CRBExecution {
     }
     
     public mutating func execute(statement: CRBStatement) throws {
-        let executor = CRBStatementExecutor(context: context)
-        try executor.execute(statement: statement)
+        let executor = CRBStatementExecutor()
+        try executor.execute(statement: statement, in: &context)
     }
         
 }
 
 public enum CRBContextMiss : Error {
     
+    case noInstance(CRBInstanceName)
+    case wrongType(instanceName: CRBInstanceName, CRBInstance)
     case noObject(objectName: CRBObjectName)
     case noAnchor(object: CRBObject, anchorName: CRBAnchorName)
     

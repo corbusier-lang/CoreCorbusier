@@ -8,8 +8,9 @@
 public enum CRBExpression {
     
     case placement(CRBPlaceExpression)
+    case instance(CRBInstanceName)
     
-}
+} 
 
 public struct CRBPlaceExpression {
     
