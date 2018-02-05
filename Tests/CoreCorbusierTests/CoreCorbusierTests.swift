@@ -38,8 +38,7 @@ class CoreCorbusierTests: XCTestCase {
         var executor = CRBExecution(context: context)
         
         let placeUnplaced: CRBStatement = {
-            let firstObjectAnchor = CRBPlaceExpression.AnchorPointRef(instanceName: crbname("first"),
-                                                                      keyPath: crbpath("bottom"))
+            let firstObjectAnchor = CRBExpression.subinstance(crbname("first"), crbpath("bottom"))
             let unplacedObjectAnchor = CRBPlaceExpression.ObjectAnchor(objectName: crbname("unplaced"),
                                                                        anchorKeyPath: [crbname("top"), crbname("left")])
             let placeExpression = CRBPlaceExpression(toPlace: unplacedObjectAnchor, distance: 10, anchorPointToPlaceFrom: firstObjectAnchor)
@@ -60,5 +59,5 @@ class CoreCorbusierTests: XCTestCase {
         let rct = try (unplaced.placed() as! Rect).rect
         XCTAssertEqual(rct, CGRect.init(x: 20, y: -40, width: 30, height: 30))
     }
-
+    
 }

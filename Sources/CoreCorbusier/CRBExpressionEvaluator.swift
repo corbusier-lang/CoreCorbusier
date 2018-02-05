@@ -28,14 +28,13 @@ public struct CRBExpressionEvaluator {
         }
     }
     
-    public func anchor(for anchorPoint: CRBPlaceExpression.AnchorPointRef) throws -> CRBAnchorInstance {
+    public func anchor(for anchorExpression: CRBExpression) throws -> CRBAnchorInstance {
 //        switch anchorPoint {
 //        case .ofObject(let objectAnchor):
 //            return try context.anchor(with: objectAnchor.anchorKeyPath,
 //                                      inObjectWith: objectAnchor.objectName)
 //        }
-        let anchorInstance = try context.instance(with: anchorPoint.instanceName,
-                                                  keyPath: anchorPoint.keyPath)
+        let anchorInstance = try evaluate(expression: anchorExpression)
         return try downcast(anchorInstance, to: CRBAnchorInstance.self)
     }
     
