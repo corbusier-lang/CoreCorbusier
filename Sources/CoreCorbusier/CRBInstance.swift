@@ -16,6 +16,20 @@ public protocol CRBInstance : AnyObject {
     
 }
 
+public protocol CRBStaticInstance : CRBInstance {
+    
+    var values: [CRBPropertyName : CRBInstance] { get }
+    
+}
+
+extension CRBStaticInstance {
+    
+    public func value(for propertyName: CRBPropertyName) -> CRBInstance? {
+        return values[propertyName]
+    }
+    
+}
+
 extension CRBInstance {
     
     public func value(for keyPath: CRBKeyPath) -> CRBInstance? {

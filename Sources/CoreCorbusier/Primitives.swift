@@ -22,23 +22,18 @@ public final class NumberInstance : CRBPlainInstance {
     
 }
 
-public final class CRBPointInstance : CRBInstance {
+public final class CRBPointInstance : CRBStaticInstance {
     
     public let point: CRBPoint
     
+    public let values: [CRBPropertyName : CRBInstance]
+    
     init(point: CRBPoint) {
         self.point = point
-    }
-    
-    public func value(for propertyName: CRBPropertyName) -> CRBInstance? {
-        switch propertyName {
-        case "x":
-            return NumberInstance(value: point.x)
-        case "y":
-            return NumberInstance(value: point.y)
-        default:
-            return nil
-        }
+        self.values = [
+            crbname("x"): NumberInstance(value: point.x),
+            crbname("y"): NumberInstance(value: point.y),
+        ]
     }
     
 }
