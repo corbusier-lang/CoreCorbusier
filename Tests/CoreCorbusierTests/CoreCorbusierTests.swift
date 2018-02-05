@@ -57,7 +57,8 @@ class CoreCorbusierTests: XCTestCase {
         let object = try executor.context.object(with: crbname("assigned"))
         dump(object)
         
-        print(try (unplaced.placed() as! Rect).rect)
+        let rct = try (unplaced.placed() as! Rect).rect
+        XCTAssertEqual(rct, CGRect.init(x: 20, y: -40, width: 30, height: 30))
     }
 
 }
