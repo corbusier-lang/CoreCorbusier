@@ -19,7 +19,7 @@ public struct Name<T> : RawRepresentable, Hashable {
     
 }
 
-func ~=<T>(string: String, name: Name<T>) -> Bool {
+public func ~=<T>(string: String, name: Name<T>) -> Bool {
     return name.rawValue == string
 }
 
