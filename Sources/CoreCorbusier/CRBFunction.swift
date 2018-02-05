@@ -8,7 +8,7 @@
 public enum _Argument { }
 public typealias CRBArgumentName = Name<_Argument>
 
-public final class CRBFunctionInstance : CRBPlainInstance {
+public class CRBFunctionInstance : CRBPlainInstance {
     
     public let argumentNames: [CRBArgumentName]
     private let _function: (inout CRBContext) throws -> CRBInstance
@@ -42,18 +42,19 @@ public final class CRBFunctionInstance : CRBPlainInstance {
     
 }
 
-public final class CRBExternalFunctionInstance : CRBPlainInstance {
-    
-    private let _function: ([CRBInstance]) throws -> CRBInstance
-    
-    init(_ function: @escaping ([CRBInstance]) throws -> CRBInstance) {
-        self._function = function
-    }
-    
-}
+//public final class CRBExternalFunctionInstance : CRBFunctionInstance {
+//
+//    init(_ function: @escaping ([CRBInstance]) throws -> CRBInstance) {
+//        super.init(argumentNames: []) { (context) throws -> CRBInstance in
+//            return try function()
+//        }
+//    }
+//
+//}
+//
+//let add = CRBExternalFunctionInstance { (instances) throws -> CRBInstance in
+//    let a = try downcast(instances[0], to: CRBNumberInstance.self)
+//    let b = try downcast(instances[1], to: CRBNumberInstance.self)
+//    return CRBNumberInstance(a.value + b.value)
+//}
 
-let add = CRBExternalFunctionInstance { (instances) throws -> CRBInstance in
-    let a = try downcast(instances[0], to: CRBNumberInstance.self)
-    let b = try downcast(instances[1], to: CRBNumberInstance.self)
-    return CRBNumberInstance(a.value + b.value)
-}
