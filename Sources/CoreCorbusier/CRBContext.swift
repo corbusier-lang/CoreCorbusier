@@ -48,6 +48,18 @@ public struct CRBContext {
         return try CRBExpressionEvaluator(context: self).evaluate(expression: expression)
     }
     
+    public func evaluate<InstanceType : CRBInstance>(expression: CRBExpression, to instanceType: InstanceType.Type) throws -> InstanceType {
+        return try CRBExpressionEvaluator(context: self).evaluate(expression: expression, to: instanceType)
+    }
+    
+    public func merged(with parentContext: CRBContext) -> CRBContext {
+        var newContext = parentContext
+        for (instanceName, instance) in self.instances {
+            newContext.instances[instanceName] = instance
+        }
+        return newContext
+    }
+    
 }
 
 public enum CRBContextMiss : Error {

@@ -8,18 +8,19 @@
 public indirect enum CRBExpression {
     
     case placement(CRBPlaceExpression)
-    case instance(CRBInstanceName)
-    case subinstance(CRBInstanceName, CRBKeyPath)
+    case instance(CRBInstance)
+    case reference(CRBInstanceName, CRBKeyPath)
+    case call(CRBExpression, arguments: [CRBExpression])
     
 } 
 
 public struct CRBPlaceExpression {
     
     public let toPlace: ObjectAnchor
-    public let distance: CRBFloat
+    public let distance: CRBExpression
     public let anchorPointToPlaceFrom: CRBExpression
     
-    public init(toPlace: ObjectAnchor, distance: CRBFloat, anchorPointToPlaceFrom: CRBExpression) {
+    public init(toPlace: ObjectAnchor, distance: CRBExpression, anchorPointToPlaceFrom: CRBExpression) {
         self.toPlace = toPlace
         self.distance = distance
         self.anchorPointToPlaceFrom = anchorPointToPlaceFrom

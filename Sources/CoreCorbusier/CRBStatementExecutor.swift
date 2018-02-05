@@ -8,18 +8,11 @@
 public struct CRBStatementExecutor {
     
     public init() { }
-    
-    private func evaluate<InstanceType : CRBInstance>(expression: CRBExpression,
-                                                      to instanceType: InstanceType.Type,
-                                                      in context: CRBContext) throws -> InstanceType {
-        let result = try context.evaluate(expression: expression)
-        return try downcast(result, to: instanceType)
-    }
-    
+        
     public func execute(statement: CRBStatement, in context: inout CRBContext) throws {
         switch statement {
         case .place(let expression):
-            let placement = try evaluate(expression: expression, to: CRBPlacementGuide.self, in: context)
+            let placement = try context.evaluate(expression: expression, to: CRBPlacementGuide.self)
             guard placement.objectToPlace.isAnchorSupported(anchorName: placement.anchorKeyPath) else {
                 throw CRBContextMiss.noAnchor(object: placement.objectToPlace, anchorName: placement.anchorKeyPath)
             }
