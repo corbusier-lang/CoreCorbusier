@@ -89,7 +89,7 @@ class Rect : CRBAnchorEnvironment {
     }
     
     func anchor(with name: CRBAnchorName) -> CRBAnchor? {
-        switch name.rawValue {
+        switch name {
         case "top":
             let side = CGSizeSide(a: CRBPoint.init(x: rect.minX, y: rect.maxY),
                                   b: CRBPoint.init(x: rect.maxX, y: rect.maxY),

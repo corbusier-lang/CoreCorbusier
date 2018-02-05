@@ -19,6 +19,11 @@ public struct Name<T> : RawRepresentable, Hashable {
     
 }
 
+func ~=<T>(string: String, name: Name<T>) -> Bool {
+    return name.rawValue == string
+}
+
+
 public func crbname<T, V>(_ converted: Name<V>) -> Name<T> {
     return Name<T>(rawValue: converted.rawValue)
 }

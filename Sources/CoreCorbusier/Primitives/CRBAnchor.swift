@@ -8,6 +8,32 @@
 public typealias CRBAnchorName = Name<CRBAnchor>
 public typealias CRBAnchorKeyPath = [CRBAnchorName]
 
+public final class CRBAnchorInstance : CRBInstance {
+    
+    public let anchor: CRBAnchor
+    
+    public init(anchor: CRBAnchor) {
+        self.anchor = anchor
+    }
+    
+    public func value(for propertyName: CRBPropertyName) -> CRBInstance? {
+        switch propertyName {
+        case "point":
+            return CRBPointInstance(point: anchor.point)
+        default:
+            return anchor(with: crbname(propertyName))
+        }
+    }
+    
+    public func anchor(with name: CRBAnchorName) -> CRBAnchorInstance? {
+        if let child = anchor.child, let anch = child.anchor(with: name) {
+            return CRBAnchorInstance(anchor: anch)
+        }
+        return nil
+    }
+    
+}
+
 public struct CRBAnchor : CRBAnchorEnvironment {
     
     let child: CRBAnchorEnvironment?

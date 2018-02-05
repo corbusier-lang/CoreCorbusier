@@ -20,7 +20,7 @@ public struct CRBExpressionEvaluator {
             let placePoint = fromAnchor.placePoint(distance: expr.distance)
             let objectToPlace = try context.object(with: expr.toPlace.objectName)
             let anchorName = expr.toPlace.anchorKeyPath
-            return CRBPlacementGuideInstance(objectToPlace: objectToPlace, anchorName: anchorName, pointToPlace: placePoint)
+            return CRBPlacementGuide(objectToPlace: objectToPlace, anchorName: anchorName, pointToPlace: placePoint)
         case .instance(let name):
             return try context.instance(with: name)
         }

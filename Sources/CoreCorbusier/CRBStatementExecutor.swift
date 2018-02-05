@@ -19,7 +19,7 @@ public struct CRBStatementExecutor {
     public func execute(statement: CRBStatement, in context: inout CRBContext) throws {
         switch statement {
         case .place(let expression):
-            let placement = try evaluate(expression: expression, to: CRBPlacementGuideInstance.self, in: context)
+            let placement = try evaluate(expression: expression, to: CRBPlacementGuide.self, in: context)
             guard placement.objectToPlace.isAnchorSupported(anchorName: placement.anchorKeyPath) else {
                 throw CRBContextMiss.noAnchor(object: placement.objectToPlace, anchorName: placement.anchorKeyPath)
             }
