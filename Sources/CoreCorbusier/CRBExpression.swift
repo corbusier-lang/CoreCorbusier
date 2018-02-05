@@ -9,6 +9,7 @@ public enum CRBExpression {
     
     case placement(CRBPlaceExpression)
     case instance(CRBInstanceName)
+    case subinstance(CRBInstanceName, CRBKeyPath)
     
 } 
 

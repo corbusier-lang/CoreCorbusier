@@ -23,6 +23,8 @@ public struct CRBExpressionEvaluator {
             return CRBPlacementGuide(objectToPlace: objectToPlace, anchorName: anchorName, pointToPlace: placePoint)
         case .instance(let name):
             return try context.instance(with: name)
+        case .subinstance(let name, let keypath):
+            return try context.instance(with: name, keyPath: keypath)
         }
     }
     
