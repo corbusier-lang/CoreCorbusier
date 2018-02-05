@@ -27,7 +27,7 @@ public struct CRBExpressionEvaluator {
         case .reference(let name, let keypath):
             return try context.instance(with: name, keyPath: keypath)
         case .call(let functionExpression, let arguments):
-            let function = try evaluate(expression: functionExpression, to: CRBFunctionInstance.self)
+            let function = try evaluate(expression: functionExpression, to: CRBFunction.self)
             return try function.evaluate(outerScope: context, arguments: arguments)
         }
     }

@@ -23,7 +23,10 @@ public struct CRBStatementExecutor {
         case .ordered(let statements):
             try statements.forEach { try self.execute(statement: $0, in: &context) }
         case .unused(let expression):
-            print("Unused expression: \(expression) ...")
+            let instance = try context.evaluate(expression: expression)
+            if instance !== VoidInstance.shared {
+                print("Unused expression: \(expression) ...")
+            }
             return
         }
     }

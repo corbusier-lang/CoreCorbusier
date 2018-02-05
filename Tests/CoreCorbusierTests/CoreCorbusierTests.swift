@@ -33,7 +33,8 @@ class CoreCorbusierTests: XCTestCase {
         context.instances = [
             crbname("first") : first,
             crbname("unplaced") : unplaced,
-            crbname("add") : CRBFunctionInstance.add()
+            crbname("add") : CRBFunctionInstance.add(),
+            crbname("print") : CRBExternalFunctionInstance.print()
         ]
         
         var executor = CRBExecution(context: context)
@@ -65,6 +66,14 @@ class CoreCorbusierTests: XCTestCase {
             return assign
         }()
         try executor.execute(statement: funcAndAssign)
+        
+        let print: CRBStatement = {
+            let function = CRBExpression.reference(crbname("print"), [])
+            let argument = CRBExpression.reference(crbname("assigned"), crbpath("top"))
+            let functionCall = CRBExpression.call(function, arguments: [argument])
+            return CRBStatement.unused(functionCall)
+        }()
+        try executor.execute(statement: print)
         
         let object = try executor.context.object(with: crbname("assigned"))
         dump(object)

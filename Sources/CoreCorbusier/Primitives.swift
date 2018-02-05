@@ -22,6 +22,14 @@ public final class CRBNumberInstance : CRBPlainInstance {
     
 }
 
+public final class VoidInstance : CRBPlainInstance {
+    
+    public static let shared = VoidInstance()
+    
+    private init() { }
+    
+}
+
 public final class CRBPointInstance : CRBStaticInstance {
     
     public let point: CRBPoint
