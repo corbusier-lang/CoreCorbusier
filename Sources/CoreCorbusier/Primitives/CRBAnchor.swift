@@ -21,7 +21,7 @@ public final class CRBAnchorInstance : CRBInstance {
         case "point":
             return CRBPointInstance(point: anchor.point)
         default:
-            return anchor(with: crbname(propertyName))
+            return anchor(with: converted(propertyName))
         }
     }
     

@@ -17,7 +17,7 @@ public struct CRBExpressionEvaluator {
         switch expression {
         case .placement(let expr):
             let fromAnchor = try self.anchor(for: expr.anchorPointToPlaceFrom)
-            let placePoint = fromAnchor.placePoint(distance: expr.distance)
+            let placePoint = fromAnchor.anchor.placePoint(distance: expr.distance)
             let objectToPlace = try context.object(with: expr.toPlace.objectName)
             let anchorName = expr.toPlace.anchorKeyPath
             return CRBPlacementGuide(objectToPlace: objectToPlace, anchorName: anchorName, pointToPlace: placePoint)
@@ -26,12 +26,15 @@ public struct CRBExpressionEvaluator {
         }
     }
     
-    public func anchor(for anchorPoint: CRBPlaceExpression.AnchorPoint) throws -> CRBAnchor {
-        switch anchorPoint {
-        case .ofObject(let objectAnchor):
-            return try context.anchor(with: objectAnchor.anchorKeyPath,
-                                      inObjectWith: objectAnchor.objectName)
-        }
+    public func anchor(for anchorPoint: CRBPlaceExpression.AnchorPointRef) throws -> CRBAnchorInstance {
+//        switch anchorPoint {
+//        case .ofObject(let objectAnchor):
+//            return try context.anchor(with: objectAnchor.anchorKeyPath,
+//                                      inObjectWith: objectAnchor.objectName)
+//        }
+        let anchorInstance = try context.instance(with: anchorPoint.instanceName,
+                                                  keyPath: anchorPoint.keyPath)
+        return try downcast(anchorInstance, to: CRBAnchorInstance.self)
     }
     
 }

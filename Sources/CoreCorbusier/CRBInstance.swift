@@ -6,7 +6,9 @@
 //
 
 public enum _Property { }
+public typealias CRBInstanceName = Name<CRBInstance>
 public typealias CRBPropertyName = Name<_Property>
+public typealias CRBKeyPath = [CRBPropertyName]
 
 public protocol CRBInstance : AnyObject {
     
@@ -14,8 +16,35 @@ public protocol CRBInstance : AnyObject {
     
 }
 
-public typealias CRBInstanceName = Name<CRBInstance>
+extension CRBInstance {
+    
+    public func value(for keyPath: CRBKeyPath) -> CRBInstance? {
+        var current: CRBInstance = self
+        for name in keyPath {
+            if let deeper = current.value(for: name) {
+                current = deeper
+            } else {
+                return nil
+            }
+        }
+        return current
+    }
+    
+}
 
+public final class CRBBlockInstance : CRBInstance {
+    
+    private let block: (CRBPropertyName) -> CRBInstance?
+    
+    public init(_ block: @escaping (CRBPropertyName) -> CRBInstance?) {
+        self.block = block
+    }
+    
+    public func value(for propertyName: CRBPropertyName) -> CRBInstance? {
+        return block(propertyName)
+    }
+    
+}
 public enum WrongTypeError : Error {
     case wrongType(instance: CRBInstance)
 }

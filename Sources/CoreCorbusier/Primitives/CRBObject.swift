@@ -18,7 +18,13 @@ public protocol CRBObject : CRBInstance {
 extension CRBObject {
     
     public func value(for propertyName: CRBPropertyName) -> CRBInstance? {
-        return nil
+        guard let placed = try? self.placed() else {
+            return nil
+        }
+        guard let anchor = placed.anchor(with: converted(propertyName)) else {
+            return nil
+        }
+        return CRBAnchorInstance(anchor: anchor)
     }
     
     public func placed() throws -> CRBAnchorEnvironment {

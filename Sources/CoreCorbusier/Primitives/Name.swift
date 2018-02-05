@@ -24,10 +24,14 @@ public func ~=<T>(string: String, name: Name<T>) -> Bool {
 }
 
 
-public func crbname<T, V>(_ converted: Name<V>) -> Name<T> {
+public func converted<T, V>(_ converted: Name<V>) -> Name<T> {
     return Name<T>(rawValue: converted.rawValue)
 }
 
 public func crbname<T>(_ rawName: String) -> Name<T> {
     return Name<T>(rawValue: rawName)
+}
+
+public func crbpath<T>(_ rawNames: String...) -> [Name<T>] {
+    return rawNames.map(crbname)
 }

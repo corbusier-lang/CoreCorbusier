@@ -16,9 +16,9 @@ public struct CRBPlaceExpression {
     
     public let toPlace: ObjectAnchor
     public let distance: CRBFloat
-    public let anchorPointToPlaceFrom: AnchorPoint
+    public let anchorPointToPlaceFrom: AnchorPointRef
     
-    public init(toPlace: ObjectAnchor, distance: CRBFloat, anchorPointToPlaceFrom: AnchorPoint) {
+    public init(toPlace: ObjectAnchor, distance: CRBFloat, anchorPointToPlaceFrom: AnchorPointRef) {
         self.toPlace = toPlace
         self.distance = distance
         self.anchorPointToPlaceFrom = anchorPointToPlaceFrom
@@ -34,8 +34,14 @@ public struct CRBPlaceExpression {
         }
     }
     
-    public enum AnchorPoint {
-        case ofObject(ObjectAnchor)
+    public struct AnchorPointRef {
+        public let instanceName: CRBInstanceName
+        public let keyPath: CRBKeyPath
+        
+        public init(instanceName: CRBInstanceName, keyPath: CRBKeyPath) {
+            self.instanceName = instanceName
+            self.keyPath = keyPath
+        }
     }
-
+    
 }

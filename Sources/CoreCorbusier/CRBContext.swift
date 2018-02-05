@@ -14,12 +14,21 @@ public struct CRBContext {
         throw CRBContextMiss.noInstance(name)
     }
     
+    public func instance(with name: CRBInstanceName, keyPath: CRBKeyPath) throws -> CRBInstance {
+        let inst = try self.instance(with: name)
+        if let subinst = inst.value(for: keyPath) {
+            return subinst
+        } else {
+            throw CRBContextMiss.noValue(keyPath, inst)
+        }
+    }
+    
     public func object(with name: CRBObjectName) throws -> CRBObject {
-        let inst = try instance(with: crbname(name))
+        let inst = try instance(with: converted(name))
         if let obj = inst as? CRBObject {
             return obj
         }
-        throw CRBContextMiss.wrongType(instanceName: crbname(name), inst)
+        throw CRBContextMiss.wrongType(instanceName: converted(name), inst)
     }
     
     public func anchor(with anchorKeyPath: CRBAnchorKeyPath, in object: CRBObject) throws -> CRBAnchor {
@@ -44,6 +53,7 @@ public struct CRBContext {
 public enum CRBContextMiss : Error {
     
     case noInstance(CRBInstanceName)
+    case noValue(CRBKeyPath, CRBInstance)
     case wrongType(instanceName: CRBInstanceName, CRBInstance)
     case noObject(objectName: CRBObjectName)
     case noAnchor(object: CRBObject, anchorName: CRBAnchorKeyPath)
