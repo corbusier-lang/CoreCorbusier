@@ -27,7 +27,11 @@ public struct CRBStatementExecutor {
             if instance !== VoidInstance.shared {
                 print("Unused expression: \(expression) ...")
             }
-            return
+        case .define(let functionName, let argumentNames, let statements):
+            let function = CRBFunctionInstance(argumentNames: argumentNames, statements: statements)
+            context.instances[converted(functionName)] = function
+        case .return(_):
+            fatalError("return is unsupported on a top-level")
         }
     }
     

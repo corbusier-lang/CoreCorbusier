@@ -11,6 +11,8 @@ public enum CRBStatement {
     case assign(CRBInstanceName, CRBExpression)
     case place(CRBExpression)
     case unused(CRBExpression)
+    case define(CRBFunctionName, [CRBArgumentName], [CRBStatement])
+    case `return`(CRBExpression)
     
     public enum Placement {
         case expression(CRBPlaceExpression)

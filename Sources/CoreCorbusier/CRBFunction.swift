@@ -7,6 +7,7 @@
 
 public enum _Argument { }
 public typealias CRBArgumentName = Name<_Argument>
+public typealias CRBFunctionName = Name<CRBFunction>
 
 public class CRBFunction : CRBPlainInstance {
     
@@ -16,6 +17,8 @@ public class CRBFunction : CRBPlainInstance {
         throw Unimplemented()
     }
     
+    struct NoReturn : Error { }
+    
 }
 
 public class CRBFunctionInstance : CRBFunction {
@@ -23,10 +26,23 @@ public class CRBFunctionInstance : CRBFunction {
     public let argumentNames: [CRBArgumentName]
     private let _function: (inout CRBContext) throws -> CRBInstance
     
-    init(argumentNames: [CRBArgumentName],
+    public init(argumentNames: [CRBArgumentName],
          _ function: @escaping (inout CRBContext) throws -> CRBInstance) {
         self.argumentNames = argumentNames
         self._function = function
+    }
+    
+    public convenience init(argumentNames: [CRBArgumentName],
+                            statements: [CRBStatement]) {
+        self.init(argumentNames: argumentNames) { (context) -> CRBInstance in
+            for statement in statements {
+                if case .return(let returnExpression) = statement {
+                    return try context.evaluate(expression: returnExpression)
+                }
+                try context.execute(statement: statement)
+            }
+            throw NoReturn()
+        }
     }
     
     public override func evaluate(outerScope: CRBContext, arguments: [CRBExpression]) throws -> CRBInstance {
@@ -75,20 +91,3 @@ public final class CRBExternalFunctionInstance : CRBFunction {
     }
     
 }
-
-//public final class CRBExternalFunctionInstance : CRBFunctionInstance {
-//
-//    init(_ function: @escaping ([CRBInstance]) throws -> CRBInstance) {
-//        super.init(argumentNames: []) { (context) throws -> CRBInstance in
-//            return try function()
-//        }
-//    }
-//
-//}
-//
-//let add = CRBExternalFunctionInstance { (instances) throws -> CRBInstance in
-//    let a = try downcast(instances[0], to: CRBNumberInstance.self)
-//    let b = try downcast(instances[1], to: CRBNumberInstance.self)
-//    return CRBNumberInstance(a.value + b.value)
-//}
-

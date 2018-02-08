@@ -67,13 +67,35 @@ class CoreCorbusierTests: XCTestCase {
         }()
         try context.execute(statement: funcAndAssign)
         
-        let print: CRBStatement = {
+        let printStatement: CRBStatement = {
             let function = CRBExpression.reference(crbname("print"), [])
             let argument = CRBExpression.reference(crbname("assigned"), crbpath("top"))
             let functionCall = CRBExpression.call(function, arguments: [argument])
             return CRBStatement.unused(functionCall)
         }()
-        try context.execute(statement: print)
+        try context.execute(statement: printStatement)
+        
+        let defineAddTwice: CRBStatement = {
+            let addFunctionCall = CRBExpression.call(CRBExpression.reference(crbname("add"), []), arguments: [CRBExpression.reference(crbname("a"), []), CRBExpression.reference(crbname("b"), [])])
+            let firstAddStatement = CRBStatement.assign(crbname("addedFirst"), addFunctionCall)
+            let addSecondFunctionCall = CRBExpression.call(CRBExpression.reference(crbname("add"), []), arguments: [CRBExpression.reference(crbname("addedFirst"), []), CRBExpression.reference(crbname("b"), [])])
+            let returnStatement = CRBStatement.return(addSecondFunctionCall)
+            return CRBStatement.define(crbname("add_twice"), [crbname("a"), crbname("b")], [firstAddStatement, returnStatement])
+        }()
+        try context.execute(statement: defineAddTwice)
+        
+        let evalAddTwice: CRBStatement = {
+            let a = CRBExpression.instance(CRBNumberInstance.init(5))
+            let b = CRBExpression.instance(CRBNumberInstance.init(10))
+            let functionExpr = CRBExpression.reference(crbname("add_twice"), [])
+            let addTwiceExpr = CRBExpression.call(functionExpr, arguments: [a, b])
+            let assign = CRBStatement.assign(crbname("added"), addTwiceExpr)
+            return assign
+        }()
+        try context.execute(statement: evalAddTwice)
+        
+        let added = try context.instance(with: crbname("added")) as! CRBNumberInstance
+        XCTAssertEqual(added.value, 25)
         
         let object = try context.object(with: crbname("assigned"))
         dump(object)
