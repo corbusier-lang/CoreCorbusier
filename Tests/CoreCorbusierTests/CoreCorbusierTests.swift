@@ -29,15 +29,15 @@ class CoreCorbusierTests: XCTestCase {
     func testExecute() throws {
         let first = CGArea(rect: CGRect(x: 0, y: 0, width: 40, height: 40))
         let unplaced = CGArea(size: CGSize(width: 30, height: 30))
-        var context = CRBContext()
-        context.instances = [
+        var originalContext = CRBContext()
+        originalContext.instances = [
             crbname("first") : first,
             crbname("unplaced") : unplaced,
             crbname("add") : CRBFunctionInstance.add(),
             crbname("print") : CRBExternalFunctionInstance.print()
         ]
         
-        var executor = CRBExecution(context: context)
+        var context = originalContext
         
         let placeUnplaced: CRBStatement = {
             let firstObjectAnchor = CRBExpression.reference(crbname("first"), crbpath("bottom"))
@@ -50,13 +50,13 @@ class CoreCorbusierTests: XCTestCase {
             let placeUnplacedExpression = CRBExpression.placement(placeExpression)
             return .place(placeUnplacedExpression)
         }()
-        try executor.execute(statement: placeUnplaced)
+        try context.execute(statement: placeUnplaced)
         
         let assign: CRBStatement = {
             let instanceExpression = CRBExpression.reference(crbname("unplaced"), [])
             return CRBStatement.assign(crbname("assigned"), instanceExpression)
         }()
-        try executor.execute(statement: assign)
+        try context.execute(statement: assign)
         
         let funcAndAssign: CRBStatement = {
             let function = CRBExpression.reference(crbname("add"), [])
@@ -65,7 +65,7 @@ class CoreCorbusierTests: XCTestCase {
             let assign = CRBStatement.assign(crbname("fifteen"), functionCallExpression)
             return assign
         }()
-        try executor.execute(statement: funcAndAssign)
+        try context.execute(statement: funcAndAssign)
         
         let print: CRBStatement = {
             let function = CRBExpression.reference(crbname("print"), [])
@@ -73,15 +73,17 @@ class CoreCorbusierTests: XCTestCase {
             let functionCall = CRBExpression.call(function, arguments: [argument])
             return CRBStatement.unused(functionCall)
         }()
-        try executor.execute(statement: print)
+        try context.execute(statement: print)
         
-        let object = try executor.context.object(with: crbname("assigned"))
+        let object = try context.object(with: crbname("assigned"))
         dump(object)
         
         let rct = try (unplaced.placed() as! Rect).rect
         XCTAssertEqual(rct, CGRect.init(x: 20, y: -40, width: 30, height: 30))
         
-        dump(executor.context)
+        dump(context)
+        XCTAssertNotEqual(context, originalContext)
+        XCTAssertEqual(context, context)
     }
     
 }

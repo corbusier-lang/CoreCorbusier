@@ -7,9 +7,9 @@ public final class JaneContext {
     
     public func run(in context: inout CRBContext) throws {
         let compound = CRBStatement.ordered(statements)
-        var execution = CRBExecution(context: context)
-        try execution.execute(statement: compound)
-        context = execution.context
+//        var execution = CRBExecution(context: context)
+//        try execution.execute(statement: compound)
+        try context.execute(statement: compound)
     }
     
     public func add(_ statement: CRBStatement) {

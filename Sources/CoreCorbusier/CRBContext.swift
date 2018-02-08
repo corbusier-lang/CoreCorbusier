@@ -44,6 +44,11 @@ public struct CRBContext {
         return try anchor(with: anchorKeyPath, in: object)
     }
     
+    private let executor = CRBStatementExecutor()
+    public mutating func execute(statement: CRBStatement) throws {
+        try executor.execute(statement: statement, in: &self)
+    }
+    
     public func evaluate(expression: CRBExpression) throws -> CRBInstance {
         return try CRBExpressionEvaluator(context: self).evaluate(expression: expression)
     }
