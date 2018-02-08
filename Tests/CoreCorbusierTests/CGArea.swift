@@ -52,7 +52,7 @@ class CGArea : CRBObject {
     }
     
     var state: CRBObjectState
-    fileprivate let size: CGSize
+    internal let size: CGSize
     
     init(size: CGSize) {
         self.size = size

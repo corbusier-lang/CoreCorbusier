@@ -3,6 +3,12 @@ import CoreCorbusier
 
 class CoreCorbusierTests: XCTestCase {
     
+    func testSpectre() {
+        testExpressionEvaluator()
+        let testResult = globalContext.run(reporter: StandardReporter())
+        XCTAssertTrue(testResult)
+    }
+    
     func testCGRect() {
         let cgrect = CGRect(x: 20, y: 20, width: 40, height: 40)
         let rect = CGArea(rect: cgrect)
