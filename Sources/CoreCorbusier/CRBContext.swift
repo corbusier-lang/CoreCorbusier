@@ -1,11 +1,11 @@
 
 public struct CRBContext {
     
-    public init() {
-        
+    public init(instances: [CRBInstanceName : CRBInstance] = [:]) {
+        self.instances = instances
     }
     
-    public var instances: [CRBInstanceName : CRBInstance] = [:]
+    public var instances: [CRBInstanceName : CRBInstance]
     
     public func instance(with name: CRBInstanceName) throws -> CRBInstance {
         if let inst = instances[name] {
@@ -73,3 +73,20 @@ public enum CRBContextMiss : Error {
 }
 
 struct UnknownExpressionError : Error { }
+
+extension CRBContext : Equatable {
+    
+    public static func == (lhs: CRBContext, rhs: CRBContext) -> Bool {
+        guard lhs.instances.keys == rhs.instances.keys else {
+            return false
+        }
+        for (key, value) in lhs.instances {
+            if rhs.instances[key] !== value {
+                return false
+            }
+        }
+        return true
+    }
+    
+}
+
