@@ -40,10 +40,15 @@ public final class JaneFunctionCall : JaneExpression {
 
 extension JaneContext {
     
-    public func jlet(_ name: String) -> JaneLet {
+    public func lett(_ name: String) -> JaneLet {
         let new = JaneLet(name: name)
         new.context = self
         return new
+    }
+    
+    public func e(_ expression: JaneExpression) {
+        let unused = CRBStatement.unused(expression.expression())
+        add(unused)
     }
     
 }
@@ -63,38 +68,22 @@ public final class JaneLet : JaneCommand {
     
 }
 
-public func i(_ name: String) -> JaneInstanceRef {
-    return JaneInstanceRef(name: crbname(name))
-}
-
-public func i(_ value: Double) -> JaneInstance {
-    let num = CRBNumberInstance(CRBFloat(value))
-    return JaneInstance(instance: num)
-}
-
-public final class JaneInstance : JaneExpression {
-    
-    let instance: CRBInstance
-    
-    public init(instance: CRBInstance) {
-        self.instance = instance
-    }
+extension Double : JaneExpression {
     
     public func expression() -> CRBExpression {
-        return CRBExpression.instance(instance)
+        return .instance(CRBNumberInstance.init(CRBFloat(self)))
     }
     
 }
 
-public final class JaneInstanceRef : JaneExpression {
+public protocol JaneInstanceRefProtocol : JaneExpression {
     
-    let name: CRBInstanceName
-    let keyPath: CRBKeyPath
+    var name: CRBInstanceName { get }
+    var keyPath: CRBKeyPath { get }
     
-    internal init(name: CRBInstanceName, keyPath: CRBKeyPath = []) {
-        self.name = name
-        self.keyPath = keyPath
-    }
+}
+
+extension JaneInstanceRefProtocol {
     
     public func at(_ key: String) -> JaneInstanceRef {
         var newKeyPath = keyPath
@@ -104,6 +93,28 @@ public final class JaneInstanceRef : JaneExpression {
     
     public func expression() -> CRBExpression {
         return CRBExpression.reference(self.name, self.keyPath)
+    }
+    
+}
+
+extension String : JaneInstanceRefProtocol {
+    
+    public var name: CRBInstanceName {
+        return crbname(self)
+    }
+    
+    public var keyPath: CRBKeyPath { return [] }
+    
+}
+
+public final class JaneInstanceRef : JaneInstanceRefProtocol {
+    
+    public let name: CRBInstanceName
+    public let keyPath: CRBKeyPath
+    
+    internal init(name: CRBInstanceName, keyPath: CRBKeyPath = []) {
+        self.name = name
+        self.keyPath = keyPath
     }
     
 }

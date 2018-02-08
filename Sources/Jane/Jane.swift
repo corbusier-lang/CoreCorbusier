@@ -18,12 +18,15 @@ public final class JaneContext {
     
 }
 
-public func jane(in context: CRBContext, _ build: (JaneContext) -> ()) throws {
+public func jane(in context: inout CRBContext, _ build: (JaneContext) -> ()) throws {
     let janeContext = JaneContext()
     build(janeContext)
+    try janeContext.run(in: &context)
+}
+
+public func jane(in context: CRBContext, _ build: (JaneContext) -> ()) throws {
     var contextCopy = context
-    try janeContext.run(in: &contextCopy)
-    dump(contextCopy)
+    try jane(in: &contextCopy, build)
 }
 
 public class JaneCommand {
