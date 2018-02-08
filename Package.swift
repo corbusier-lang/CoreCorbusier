@@ -10,6 +10,9 @@ let package = Package(
         .library(
             name: "CoreCorbusier",
             targets: ["CoreCorbusier"]),
+        .library(
+            name: "Jane",
+            targets: ["Jane"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -21,8 +24,14 @@ let package = Package(
         .target(
             name: "CoreCorbusier",
             dependencies: []),
+        .target(
+            name: "Jane",
+            dependencies: ["CoreCorbusier"]),
+        .testTarget(
+            name: "JaneTests",
+            dependencies: ["Jane"]),
         .testTarget(
             name: "CoreCorbusierTests",
-            dependencies: ["CoreCorbusier"]),
+            dependencies: ["CoreCorbusier", "Jane"]),
     ]
 )
