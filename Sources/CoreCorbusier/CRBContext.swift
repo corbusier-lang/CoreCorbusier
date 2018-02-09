@@ -1,17 +1,77 @@
 
-public struct CRBContext {
+public struct Stack<T> {
+    fileprivate var array = [T]()
+    
+    public init(_ array: [T] = []) {
+        self.array = array
+    }
+    
+    public var isEmpty: Bool {
+        return array.isEmpty
+    }
+    
+    public var count: Int {
+        return array.count
+    }
+    
+    public mutating func push(_ element: T) {
+        array.append(element)
+    }
+    
+    @discardableResult
+    public mutating func pop() -> T? {
+        return array.popLast()
+    }
+    
+    public var top: T? {
+        return array.last
+    }
+}
+
+public struct CRBScope {
+    
+    public var instances: [CRBInstanceName : CRBInstance]
     
     public init(instances: [CRBInstanceName : CRBInstance] = [:]) {
         self.instances = instances
     }
     
-    public var instances: [CRBInstanceName : CRBInstance]
+}
+
+public struct CRBContext {
     
-    public func instance(with name: CRBInstanceName) throws -> CRBInstance {
-        if let inst = instances[name] {
-            return inst
+    public init(instances: [CRBInstanceName : CRBInstance] = [:]) {
+        let scope = CRBScope(instances: instances)
+        self.init(scopes: Stack([scope]))
+    }
+    
+    public init(scopes: Stack<CRBScope>) {
+        self.scopes = scopes
+    }
+    
+    public var scopes: Stack<CRBScope>
+    public var currentScope: CRBScope {
+        get { return scopes.top! }
+        set { scopes.pop(); scopes.push(newValue) }
+    }
+    
+    private func instance(with name: CRBInstanceName, in scope: CRBScope) -> CRBInstance? {
+        return scope.instances[name]
+    }
+    
+    private func instance(with name: CRBInstanceName, in stack: Stack<CRBScope>) throws -> CRBInstance {
+        var copiedStack = stack
+        if let topScope = copiedStack.pop() {
+            if let inThis = instance(with: name, in: topScope) {
+                return inThis
+            }
+            return try instance(with: name, in: copiedStack)
         }
         throw CRBContextMiss.noInstance(name)
+    }
+    
+    public func instance(with name: CRBInstanceName) throws -> CRBInstance {
+        return try instance(with: name, in: scopes)
     }
     
     public func instance(with name: CRBInstanceName, keyPath: CRBKeyPath) throws -> CRBInstance {
@@ -56,15 +116,7 @@ public struct CRBContext {
     public func evaluate<InstanceType : CRBInstance>(expression: CRBExpression, to instanceType: InstanceType.Type) throws -> InstanceType {
         return try CRBExpressionEvaluator(context: self).evaluate(expression: expression, to: instanceType)
     }
-    
-    public func merged(with parentContext: CRBContext) -> CRBContext {
-        var newContext = parentContext
-        for (instanceName, instance) in self.instances {
-            newContext.instances[instanceName] = instance
-        }
-        return newContext
-    }
-    
+        
 }
 
 public enum CRBContextMiss : Error {
@@ -79,9 +131,9 @@ public enum CRBContextMiss : Error {
 
 struct UnknownExpressionError : Error { }
 
-extension CRBContext : Equatable {
+extension CRBScope : Equatable {
     
-    public static func == (lhs: CRBContext, rhs: CRBContext) -> Bool {
+    public static func == (lhs: CRBScope, rhs: CRBScope) -> Bool {
         guard lhs.instances.keys == rhs.instances.keys else {
             return false
         }
@@ -95,3 +147,10 @@ extension CRBContext : Equatable {
     
 }
 
+extension CRBContext : Equatable {
+    
+    public static func == (lhs: CRBContext, rhs: CRBContext) -> Bool {
+        return lhs.scopes.array == rhs.scopes.array
+    }
+    
+}

@@ -19,7 +19,7 @@ public struct CRBStatementExecutor {
             placement.objectToPlace.place(at: placement.pointToPlace, fromAnchorWith: placement.anchorKeyPath)
         case .assign(let instanceName, let expression):
             let instance = try context.evaluate(expression: expression)
-            context.instances[instanceName] = instance
+            context.currentScope.instances[instanceName] = instance
         case .ordered(let statements):
             try statements.forEach { try self.execute(statement: $0, in: &context) }
         case .unused(let expression):
@@ -29,7 +29,7 @@ public struct CRBStatementExecutor {
             }
         case .define(let functionName, let argumentNames, let statements):
             let function = CRBFunctionInstance(argumentNames: argumentNames, statements: statements)
-            context.instances[converted(functionName)] = function
+            context.currentScope.instances[converted(functionName)] = function
         case .return(_):
             fatalError("return is unsupported on a top-level")
         case .conditioned(let `if`, let `do`, let `else`):

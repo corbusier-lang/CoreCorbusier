@@ -13,7 +13,7 @@ public class CRBFunction : CRBPlainInstance {
     
     struct Unimplemented : Error { }
     
-    public func evaluate(outerScope: CRBContext, arguments: [CRBExpression]) throws -> CRBInstance {
+    public func evaluate(in context: CRBContext, arguments: [CRBExpression]) throws -> CRBInstance {
         throw Unimplemented()
     }
     
@@ -45,15 +45,17 @@ public class CRBFunctionInstance : CRBFunction {
         }
     }
     
-    public override func evaluate(outerScope: CRBContext, arguments: [CRBExpression]) throws -> CRBInstance {
+    public override func evaluate(in context: CRBContext, arguments: [CRBExpression]) throws -> CRBInstance {
         assert(argumentNames.count == arguments.count)
-        let parameters = try arguments.map({ try outerScope.evaluate(expression: $0) })
-        var functionScope = CRBContext()
+        let parameters = try arguments.map({ try context.evaluate(expression: $0) })
+        var functionScope = CRBScope()
         for (argName, parameter) in zip(argumentNames, parameters) {
             functionScope.instances[converted(argName)] = parameter
         }
-        var mergedScope = functionScope.merged(with: outerScope)
-        return try _function(&mergedScope)
+        var contextCopy = context
+        contextCopy.scopes.push(functionScope)
+        let result = try _function(&contextCopy)
+        return result
     }
     
     public static func add() -> CRBFunctionInstance {
@@ -76,8 +78,8 @@ public final class CRBExternalFunctionInstance : CRBFunction {
         self._function = function
     }
     
-    public override func evaluate(outerScope: CRBContext, arguments: [CRBExpression]) throws -> CRBInstance {
-        let parameters = try arguments.map({ try outerScope.evaluate(expression: $0) })
+    public override func evaluate(in context: CRBContext, arguments: [CRBExpression]) throws -> CRBInstance {
+        let parameters = try arguments.map({ try context.evaluate(expression: $0) })
         return try _function(parameters)
     }
     
