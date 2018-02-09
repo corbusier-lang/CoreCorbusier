@@ -20,6 +20,12 @@ public final class JaneContext {
     
 }
 
+public func statement(jane: (JaneContext) -> ()) -> CRBStatement {
+    let janeContext = JaneContext()
+    jane(janeContext)
+    return janeContext.statements[0]
+}
+
 public func jane(in context: inout CRBContext, _ build: (JaneContext) -> ()) throws {
     let janeContext = JaneContext()
     build(janeContext)

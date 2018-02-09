@@ -12,15 +12,18 @@ extension CRBPlainInstance {
     }
 }
 
-public final class CRBNumberInstance : CRBPlainInstance {
+public final class CRBValueInstance<Value> : CRBPlainInstance {
     
-    public let value: CRBFloat
+    public let value: Value
     
-    public init(_ value: CRBFloat) {
+    public init(_ value: Value) {
         self.value = value
     }
     
 }
+
+public typealias CRBNumberInstance = CRBValueInstance<CRBFloat>
+public typealias CRBBoolInstance = CRBValueInstance<Bool>
 
 public final class VoidInstance : CRBPlainInstance {
     

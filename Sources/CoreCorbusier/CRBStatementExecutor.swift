@@ -32,6 +32,13 @@ public struct CRBStatementExecutor {
             context.instances[converted(functionName)] = function
         case .return(_):
             fatalError("return is unsupported on a top-level")
+        case .conditioned(let `if`, let `do`, let `else`):
+            let bool = try context.evaluate(expression: `if`, to: CRBBoolInstance.self)
+            if bool.value == true {
+                try execute(statement: `do`, in: &context)
+            } else {
+                try execute(statement: `else`, in: &context)
+            }
         }
     }
     

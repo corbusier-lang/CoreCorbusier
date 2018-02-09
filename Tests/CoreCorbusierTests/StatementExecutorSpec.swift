@@ -104,21 +104,75 @@ func testStatements() {
     describe("define statement") {
         $0.it("adds a function to instances") {
             var context = originalContext
-            let jane = JaneContext()
-            jane.define.f("newfunc").args().build({ (c) in
-                c.retur(void)
+            let def = statement(jane: { (j) in
+                j.define.f("newfunc").args().build({ (c) in
+                    c.retur(void)
+                })
             })
-            let defStatement = jane.statements[0]
-            guard case .define = defStatement else {
+            guard case .define = def else {
                 throw "Not a define statement"
             }
-            try executor.execute(statement: defStatement, in: &context)
+            try executor.execute(statement: def, in: &context)
             _ = try context.instance(with: crbname("newfunc"))
             context.instances[crbname("newfunc")] = nil
             try expect(context) == originalContext
         }
     }
     
+    describe("if statement") {
+        $0.it("executes do statement if condition is true") {
+            let ctrue = CRBBoolInstance(true)
+            var doWasExecuted = false
+            var elseWasExecuted = false
+            let toExecute = blockStatement {
+                doWasExecuted = true
+            }
+            let notToExecute = blockStatement {
+                elseWasExecuted = true
+            }
+            let condition = CRBStatement.conditioned(if: .instance(ctrue), do: toExecute, else: notToExecute)
+            var context = originalContext
+            try executor.execute(statement: condition, in: &context)
+            try expect(doWasExecuted).to.beTrue()
+            try expect(elseWasExecuted).to.beFalse()
+            try expect(context) == originalContext
+        }
+        $0.it("executes else statement if condition is false") {
+            let ctrue = CRBBoolInstance(false)
+            var doWasExecuted = false
+            var elseWasExecuted = false
+            let toExecute = blockStatement {
+                doWasExecuted = true
+            }
+            let notToExecute = blockStatement {
+                elseWasExecuted = true
+            }
+            let condition = CRBStatement.conditioned(if: .instance(ctrue), do: toExecute, else: notToExecute)
+            var context = originalContext
+            try executor.execute(statement: condition, in: &context)
+            try expect(doWasExecuted).to.beFalse()
+            try expect(elseWasExecuted).to.beTrue()
+            try expect(context) == originalContext
+        }
+        $0.it("fails if condition is not bool") {
+            let notBool = CRBNumberInstance(5.0)
+            let condition = CRBStatement.conditioned(if: .instance(notBool),
+                                                     do: blockStatement({ fatalError() }),
+                                                     else: blockStatement({ fatalError() }))
+            var context = originalContext
+            try expect(try executor.execute(statement: condition, in: &context)).toThrow()
+        }
+    }
+    
+}
+
+func blockStatement(_ block: @escaping () -> ()) -> CRBStatement {
+    let function = CRBExternalFunctionInstance { _ in
+        block()
+        return VoidInstance.shared
+    }
+    let call = CRBExpression.call(.instance(function), arguments: [])
+    return CRBStatement.unused(call)
 }
 
 extension String : Error { }
