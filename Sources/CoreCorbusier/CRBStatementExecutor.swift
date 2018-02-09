@@ -10,6 +10,10 @@ public struct CRBStatementExecutor {
     public init() { }
         
     public func execute(statement: CRBStatement, in context: inout CRBContext) throws {
+        guard context.returningValue == nil else {
+            print("No statements can be executed after return")
+            return
+        }
         switch statement {
         case .place(let expression):
             let placement = try context.evaluate(expression: expression, to: CRBPlacementGuide.self)
@@ -30,15 +34,19 @@ public struct CRBStatementExecutor {
         case .define(let functionName, let argumentNames, let statements):
             let function = CRBFunctionInstance(argumentNames: argumentNames, statements: statements)
             context.currentScope.instances[converted(functionName)] = function
-        case .return(_):
-            fatalError("return is unsupported on a top-level")
+        case .return(let expr):
+            let instance = try context.evaluate(expression: expr)
+            context.returningValue = instance
         case .conditioned(let `if`, let `do`, let `else`):
             let bool = try context.evaluate(expression: `if`, to: CRBBoolInstance.self)
+            let branchScope = CRBScope()
+            context.scopes.push(branchScope)
             if bool.value == true {
                 try execute(statement: `do`, in: &context)
             } else {
                 try execute(statement: `else`, in: &context)
             }
+            context.scopes.pop()
         }
     }
     

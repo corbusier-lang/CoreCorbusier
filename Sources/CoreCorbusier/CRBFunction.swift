@@ -35,11 +35,10 @@ public class CRBFunctionInstance : CRBFunction {
     public convenience init(argumentNames: [CRBArgumentName],
                             statements: [CRBStatement]) {
         self.init(argumentNames: argumentNames) { (context) -> CRBInstance in
-            for statement in statements {
-                if case .return(let returnExpression) = statement {
-                    return try context.evaluate(expression: returnExpression)
-                }
-                try context.execute(statement: statement)
+            let ordered = CRBStatement.ordered(statements)
+            try context.execute(statement: ordered)
+            if let returning = context.returningValue {
+                return returning
             }
             throw NoReturn()
         }

@@ -56,7 +56,7 @@ func testStatements() {
             let number = CRBNumberInstance(5.0)
             var context = originalContext
             var expectedContext = originalContext
-            expectedContext.instances[crbname("number")] = number
+            expectedContext.currentScope.instances[crbname("number")] = number
             let assignStatement = CRBStatement.assign(crbname("number"), .instance(number))
             try executor.execute(statement: assignStatement, in: &context)
             try expect(context) == expectedContext
@@ -78,8 +78,8 @@ func testStatements() {
             let composed = CRBStatement.ordered([assignStatement1, assignStatement2])
             var context = originalContext
             var expectedContext = originalContext
-            expectedContext.instances[crbname("one")] = number1
-            expectedContext.instances[crbname("two")] = number2
+            expectedContext.currentScope.instances[crbname("one")] = number1
+            expectedContext.currentScope.instances[crbname("two")] = number2
             try executor.execute(statement: composed, in: &context)
             try expect(context) == expectedContext
         }
@@ -114,8 +114,22 @@ func testStatements() {
             }
             try executor.execute(statement: def, in: &context)
             _ = try context.instance(with: crbname("newfunc"))
-            context.instances[crbname("newfunc")] = nil
+            context.currentScope.instances[crbname("newfunc")] = nil
             try expect(context) == originalContext
+        }
+    }
+    
+    describe("return statement") {
+        $0.it("assigns a returningValue to context") {
+            let inst = CRBNumberInstance(10.0)
+            var context = originalContext
+            try executor.execute(statement: .`return`(.instance(inst)), in: &context)
+            
+            var expectedContext = originalContext
+            expectedContext.returningValue = inst
+            
+            try expect((context.returningValue! as! CRBNumberInstance).value) == 10.0
+            try expect(context) == expectedContext
         }
     }
     

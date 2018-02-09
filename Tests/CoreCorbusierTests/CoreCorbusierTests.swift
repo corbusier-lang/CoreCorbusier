@@ -37,7 +37,7 @@ class CoreCorbusierTests: XCTestCase {
         let first = CGArea(rect: CGRect(x: 0, y: 0, width: 40, height: 40))
         let unplaced = CGArea(size: CGSize(width: 30, height: 30))
         var originalContext = CRBContext()
-        originalContext.instances = [
+        originalContext.currentScope.instances = [
             crbname("first") : first,
             crbname("unplaced") : unplaced,
             crbname("add") : CRBFunctionInstance.add(),

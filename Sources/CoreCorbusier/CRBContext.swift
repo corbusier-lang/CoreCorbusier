@@ -40,6 +40,8 @@ public struct CRBScope {
 
 public struct CRBContext {
     
+    public var returningValue: CRBInstance?
+    
     public init(instances: [CRBInstanceName : CRBInstance] = [:]) {
         let scope = CRBScope(instances: instances)
         self.init(scopes: Stack([scope]))
@@ -150,7 +152,17 @@ extension CRBScope : Equatable {
 extension CRBContext : Equatable {
     
     public static func == (lhs: CRBContext, rhs: CRBContext) -> Bool {
-        return lhs.scopes.array == rhs.scopes.array
+        guard lhs.scopes.array == rhs.scopes.array else {
+            return false
+        }
+        switch (lhs.returningValue, rhs.returningValue) {
+        case (.none, .none):
+            return true
+        case (.some(let l), .some(let r)):
+            return l === r
+        default:
+            return false
+        }
     }
     
 }

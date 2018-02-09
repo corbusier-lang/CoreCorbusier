@@ -10,7 +10,7 @@ class JaneTests: XCTestCase {
         let area2 = CGArea(size: .init(width: 100, height: 100))
         
         var context = CRBContext()
-        context.instances = [
+        context.currentScope.instances = [
             crbname("point"): CRBPointInstance.init(point: CRBPoint.init(x: 5, y: 10)),
             crbname("rect"): rect,
             crbname("area"): area,
@@ -63,7 +63,7 @@ class JaneTests: XCTestCase {
             let areEqual = left.value == right.value
             return CRBBoolInstance(areEqual)
         }
-        context.instances[crbname("equals")] = equals
+        context.currentScope.instances[crbname("equals")] = equals
         
         try jane(in: &context, { (j) in
             j.if_("equals".call(5.0, 5.0)).do_({ (c) in
