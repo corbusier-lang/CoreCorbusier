@@ -26,11 +26,11 @@ class JaneTests: XCTestCase {
         let (context, area, area2) = makeContext()
         
         try jane(in: context) { j in
-            j.place(o("area").at("left").at("top").distance(10).from("rect".at("right").at("top")))
-            j.lett("bottom").equals("area".at("bottom"))
-            j.lett("guide").equals(o("area2").at("top").distance(50).from("bottom"))
+            j.place(o("area").at("left").at("top").distance(10).from("rect"["right"]["top"]))
+            j.let_("bottom").equals("area"["bottom"])
+            j.let_("guide").equals(o("area2").at("top").distance(50).from("bottom"))
             j.place("guide")
-            j.lett("fifteen").equals("add".call(5.0, 10.0))
+            j.let_("fifteen").equals("add".call(5.0, 10.0))
         }
         
         dump(area)
@@ -44,13 +44,36 @@ class JaneTests: XCTestCase {
         
         try jane(in: &context, { (j) in
             j.define.f("add_twice").args("a", "b").build({ (c) in
-                c.lett("added_first").equals("add".call("a", "b"))
-                c.lett("added_twice").equals("add".call("added_first", "b"))
+                c.let_("added_first").equals("add".call("a", "b"))
+                c.let_("added_twice").equals("add".call("added_first", "b"))
                 c.retur("added_twice")
             })
-            j.lett("added").equals("add_twice".call(5.0, 10.0))
+            j.let_("added").equals("add_twice".call(5.0, 10.0))
             j.e("print".call("added"))
         })
+        
+    }
+    
+    func testIf() throws {
+        
+        var (context, _, _) = makeContext()
+        let equals = CRBExternalFunctionInstance { args in
+            let left = args[0] as! CRBNumberInstance
+            let right = args[1] as! CRBNumberInstance
+            let areEqual = left.value == right.value
+            return CRBBoolInstance(areEqual)
+        }
+        context.instances[crbname("equals")] = equals
+        
+        try jane(in: &context, { (j) in
+            j.if_("equals".call(5.0, 5.0)).do_({ (c) in
+                c.let_("new").equals(10.0)
+            }).else_({ (c) in
+                c.let_("new").equals(15.0)
+            })
+        })
+        let num = try context.instance(with: crbname("new")) as! CRBNumberInstance
+        XCTAssertEqual(num.value, 10.0)
         
     }
 

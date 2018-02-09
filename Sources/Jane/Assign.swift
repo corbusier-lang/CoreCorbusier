@@ -40,7 +40,7 @@ public final class JaneFunctionCall : JaneExpression {
 
 extension JaneContext {
     
-    public func lett(_ name: String) -> JaneLet {
+    public func let_(_ name: String) -> JaneLet {
         let new = JaneLet(name: name)
         new.context = self
         return new
@@ -76,6 +76,14 @@ extension Double : JaneExpression {
     
 }
 
+extension Bool : JaneExpression {
+    
+    public func expression() -> CRBExpression {
+        return .instance(CRBBoolInstance(self))
+    }
+    
+}
+
 public protocol JaneInstanceRefProtocol : JaneExpression {
     
     var name: CRBInstanceName { get }
@@ -89,6 +97,10 @@ extension JaneInstanceRefProtocol {
         var newKeyPath = keyPath
         newKeyPath.append(crbname(key))
         return JaneInstanceRef(name: self.name, keyPath: newKeyPath)
+    }
+    
+    public subscript(key: String) -> JaneInstanceRef {
+        return at(key)
     }
     
     public func expression() -> CRBExpression {

@@ -69,7 +69,7 @@ func testExpressionEvaluator() {
     
     describe("placement expression") {
         $0.it("evaluates to a placement guide") {
-            let placeExpression = Jane.o("size").at("top").at("right").distance(10).from("rect".at("left")).expression()
+            let placeExpression = Jane.o("size").at("top").at("right").distance(10).from("rect"["left"]).expression()
             let guide = try evaluator.evaluate(expression: placeExpression, to: CRBPlacementGuide.self)
             try expect(guide.anchorKeyPath) == crbpath("top", "right")
             try expect(ObjectIdentifier(guide.objectToPlace)) == ObjectIdentifier(sizeObj)
