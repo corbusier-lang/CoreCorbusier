@@ -7,6 +7,14 @@
 
 import CoreCorbusier
 
+public final class JaneVoid : JaneExpression {
+    public func expression() -> CRBExpression {
+        return .instance(VoidInstance.shared)
+    }
+}
+
+public let void = JaneVoid()
+
 extension JaneContext {
     
     public var define: JaneDefine {

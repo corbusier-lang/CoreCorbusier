@@ -3,7 +3,9 @@ import CoreCorbusier
 
 public final class JaneContext {
     
-    var statements: [CRBStatement] = []
+    public var statements: [CRBStatement] = []
+    
+    public init() { }
     
     public func run(in context: inout CRBContext) throws {
         let compound = CRBStatement.ordered(statements)
