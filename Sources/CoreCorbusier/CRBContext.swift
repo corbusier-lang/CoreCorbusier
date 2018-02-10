@@ -1,16 +1,17 @@
 
 public struct Stack<T> {
-    fileprivate var array = [T]()
+    
+    public private(set) var array = [T]()
     
     public init(_ array: [T] = []) {
         self.array = array
     }
     
-    public var isEmpty: Bool {
+    internal var isEmpty: Bool {
         return array.isEmpty
     }
     
-    public var count: Int {
+    internal var count: Int {
         return array.count
     }
     
@@ -72,12 +73,8 @@ public struct CRBContext {
         throw CRBContextMiss.noInstance(name)
     }
     
-    public func instance(with name: CRBInstanceName) throws -> CRBInstance {
-        return try instance(with: name, in: scopes)
-    }
-    
-    public func instance(with name: CRBInstanceName, keyPath: CRBKeyPath) throws -> CRBInstance {
-        let inst = try self.instance(with: name)
+    public func instance(with name: CRBInstanceName, keyPath: CRBKeyPath = []) throws -> CRBInstance {
+        let inst = try self.instance(with: name, in: scopes)
         if let subinst = inst.value(for: keyPath) {
             return subinst
         } else {
@@ -91,19 +88,6 @@ public struct CRBContext {
             return obj
         }
         throw CRBContextMiss.wrongType(instanceName: converted(name), inst)
-    }
-    
-    public func anchor(with anchorKeyPath: CRBAnchorKeyPath, in object: CRBObject) throws -> CRBAnchor {
-        guard object.isAnchorSupported(anchorName: anchorKeyPath) else {
-            throw CRBContextMiss.noAnchor(object: object, anchorName: anchorKeyPath)
-        }
-        let placedObject = try object.placed()
-        return placedObject.anchor(at: anchorKeyPath)!
-    }
-    
-    public func anchor(with anchorKeyPath: CRBAnchorKeyPath, inObjectWith objectName: CRBObjectName) throws -> CRBAnchor {
-        let object = try self.object(with: objectName)
-        return try anchor(with: anchorKeyPath, in: object)
     }
     
     private let executor = CRBStatementExecutor()
