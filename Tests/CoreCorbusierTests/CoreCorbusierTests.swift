@@ -5,8 +5,8 @@ class CoreCorbusierTests: XCTestCase {
     
     func testSpectre() {
         testContext()
-        //testExpressionEvaluator()
-        //testStatements()
+        testExpressionEvaluator()
+        testStatements()
         let testResult = globalContext.run(reporter: StandardReporter())
         XCTAssertTrue(testResult)
     }
