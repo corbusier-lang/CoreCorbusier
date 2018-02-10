@@ -16,6 +16,14 @@ public protocol CRBInstance : AnyObject {
     
 }
 
+extension CRBInstance {
+    
+    public func objectIdentifier() -> ObjectIdentifier {
+        return ObjectIdentifier(self)
+    }
+    
+}
+
 public protocol CRBStaticInstance : CRBInstance {
     
     var values: [CRBPropertyName : CRBInstance] { get }

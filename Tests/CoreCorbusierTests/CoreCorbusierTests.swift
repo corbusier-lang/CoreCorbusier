@@ -4,6 +4,7 @@ import CoreCorbusier
 class CoreCorbusierTests: XCTestCase {
     
     func testSpectre() {
+        testContext()
         testExpressionEvaluator()
         testStatements()
         let testResult = globalContext.run(reporter: StandardReporter())

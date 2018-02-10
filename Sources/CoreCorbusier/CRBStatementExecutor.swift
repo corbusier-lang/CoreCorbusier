@@ -7,6 +7,10 @@
 
 public struct CRBStatementExecutor {
     
+    enum Error : Swift.Error {
+        case nameIsAlreadyTaken(CRBInstanceName)
+    }
+    
     public init() { }
         
     public func execute(statement: CRBStatement, in context: inout CRBContext) throws {
@@ -23,6 +27,9 @@ public struct CRBStatementExecutor {
             placement.objectToPlace.place(at: placement.pointToPlace, fromAnchorWith: placement.anchorKeyPath)
         case .assign(let instanceName, let expression):
             let instance = try context.evaluate(expression: expression)
+            guard context.currentScope.instances[instanceName] == nil else {
+                throw Error.nameIsAlreadyTaken(instanceName)
+            }
             context.currentScope.instances[instanceName] = instance
         case .ordered(let statements):
             try statements.forEach { try self.execute(statement: $0, in: &context) }

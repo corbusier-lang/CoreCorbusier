@@ -67,12 +67,12 @@ class JaneTests: XCTestCase {
         
         try jane(in: &context, { (j) in
             j.if_("equals".call(5.0, 5.0)).do_({ (c) in
-                c.let_("new").equals(10.0)
+                c.retur(10.0)
             }).else_({ (c) in
-                c.let_("new").equals(15.0)
+                c.retur(10.0)
             })
         })
-        let num = try context.instance(with: crbname("new")) as! CRBNumberInstance
+        let num = context.returningValue as! CRBNumberInstance
         XCTAssertEqual(num.value, 10.0)
         
     }

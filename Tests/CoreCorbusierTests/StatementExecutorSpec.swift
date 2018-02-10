@@ -67,6 +67,13 @@ func testStatements() {
             var context = originalContext
             try expect(try executor.execute(statement: assign, in: &context)).toThrow()
         }
+        $0.it("throws if name is already taken") {
+            let assign1 = statement { $0.let_("a").equals(5.0) }
+            let assign2 = statement { $0.let_("a").equals(10.0) }
+            var context = originalContext
+            try executor.execute(statement: assign1, in: &context)
+            try expect(try executor.execute(statement: assign2, in: &context)).toThrow()
+        }
     }
     
     describe("ordered statement") {
