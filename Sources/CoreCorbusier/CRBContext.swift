@@ -50,8 +50,15 @@ public struct CRBContext {
     public var returningValue: CRBInstance?
     
     public init(instances: [CRBInstanceName : CRBInstance] = [:]) {
-        let scope = CRBScope(instances: instances)
-        self.init(scopes: Stack([scope]))
+        let extLib = ExtLib.scope()
+        let mainScope = CRBScope(instances: instances)
+        let stack = Stack([extLib, mainScope])
+        self.init(scopes: stack)
+    }
+    
+    public static func withoutExtLib(instances: [CRBInstanceName : CRBInstance] = [:]) -> CRBContext {
+        let mainScope = CRBScope(instances: instances)
+        return .init(scopes: Stack([mainScope]))
     }
     
     public init(scopes: Stack<CRBScope>) {

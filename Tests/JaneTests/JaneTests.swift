@@ -15,7 +15,6 @@ class JaneTests: XCTestCase {
             crbname("rect"): rect,
             crbname("area"): area,
             crbname("area2"): area2,
-            crbname("add"): CRBFunctionInstance.add(),
             crbname("print"): CRBExternalFunctionInstance.print(),
         ]
         return (context, area, area2)
@@ -51,6 +50,23 @@ class JaneTests: XCTestCase {
             j.let_("added").equals("add_twice".call(5.0, 10.0))
             j.e("print".call("added"))
         })
+        
+    }
+    
+    func testDeclSubtract() throws {
+        
+        var context = CRBContext()
+        try jane(in: &context, { (j) in
+            
+            j.define.f("subtract").args("a", "b").build({ (f) in
+                f.let_("second_minus").equals("negate".call("b"))
+                f.retur("add".call("a", "second_minus"))
+            })
+            j.retur("subtract".call(10.0, 5.0))
+            
+        })
+        let num = context.returningValue! as! CRBNumberInstance
+        XCTAssertEqual(num.value, 5.0)
         
     }
     

@@ -41,7 +41,6 @@ class CoreCorbusierTests: XCTestCase {
         originalContext.currentScope.instances = [
             crbname("first") : first,
             crbname("unplaced") : unplaced,
-            crbname("add") : CRBFunctionInstance.add(),
             crbname("print") : CRBExternalFunctionInstance.print()
         ]
         
