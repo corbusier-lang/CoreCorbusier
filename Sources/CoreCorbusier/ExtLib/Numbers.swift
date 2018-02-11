@@ -11,8 +11,22 @@ public enum ExtLib {
         return CRBScope(instances: [
             crbname("add"): ExtLibNumbers.add,
             crbname("negate"): ExtLibNumbers.negate,
-            crbname("greater"): ExtLibNumbers.greater
+            crbname("greater"): ExtLibNumbers.greater,
+            crbname("identical"): identical
         ])
+    }
+    
+    public static var identical: CRBExternalFunctionInstance {
+        return CRBExternalFunctionInstance({ (instances) -> CRBInstance in
+            var instances = instances
+            let firstInstance = instances.removeFirst()
+            for instance in instances {
+                if instance !== firstInstance {
+                    return CRBBoolInstance(false)
+                }
+            }
+            return CRBBoolInstance(true)
+        })
     }
     
 }
