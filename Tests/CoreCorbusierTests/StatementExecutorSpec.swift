@@ -118,8 +118,8 @@ func testStatements() {
         $0.it("adds a function to instances") {
             var context = originalContext
             let def = statement(jane: { (j) in
-                j.define.f("newfunc").args().build({ (c) in
-                    c.retur(void)
+                j.def("newfunc").args().build({ (c) in
+                    c.return_(void)
                 })
             })
             guard case .define = def else {

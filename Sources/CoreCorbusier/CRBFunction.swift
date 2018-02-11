@@ -55,16 +55,6 @@ public class CRBFunctionInstance : CRBFunction {
         return result
     }
     
-    public static func add() -> CRBFunctionInstance {
-        return CRBFunctionInstance(argumentNames: [crbname("a"), crbname("b")], { (context) -> CRBInstance in
-            let ia = try context.instance(with: crbname("a"))
-            let a = try downcast(ia, to: CRBNumberInstance.self)
-            let ib = try context.instance(with: crbname("b"))
-            let b = try downcast(ib, to: CRBNumberInstance.self)
-            return CRBNumberInstance(a.value + b.value)
-        })
-    }
-    
 }
 
 public final class CRBExternalFunctionInstance : CRBFunction {

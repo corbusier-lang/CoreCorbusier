@@ -18,7 +18,7 @@ func testFunctions() {
             try expect(result.objectIdentifier()) == VoidInstance.shared.objectIdentifier()
         }
         $0.it("returns null when return null") {
-            let statement1 = statement(jane: { $0.retur(null) })
+            let statement1 = statement(jane: { $0.return_(null) })
             let function = CRBFunctionInstance.init(argumentNames: [], statements: [statement1])
             let result = try function.evaluate(in: CRBContext(), arguments: [])
             try expect(result.objectIdentifier()) == CRBNull.shared.objectIdentifier()

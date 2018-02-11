@@ -24,24 +24,16 @@ public let null = JaneNull()
 
 extension JaneContext {
     
-    public var define: JaneDefine {
-        let jd = JaneDefine()
-        jd.context = self
-        return jd
+    public func def(_ functionName: String) -> JaneFunctionName {
+        let jfn = JaneFunctionName(functionName: crbname(functionName))
+        jfn.context = self
+        return jfn
     }
     
-    public func retur(_ expression: JaneExpression) {
+    public func return_(_ expression: JaneExpression) {
         let cexpression = expression.expression()
         let statement = CRBStatement.return(cexpression)
         self.add(statement)
-    }
-    
-}
-
-public final class JaneDefine : JaneCommand {
-    
-    public func f(_ functionName: String) -> JaneFunctionName {
-        return pass({ JaneFunctionName.init(functionName: crbname(functionName)) })
     }
     
 }

@@ -42,10 +42,10 @@ class JaneTests: XCTestCase {
         var (context, _, _) = makeContext()
         
         try jane(in: &context, { (j) in
-            j.define.f("add_twice").args("a", "b").build({ (c) in
+            j.def("add_twice").args("a", "b").build({ (c) in
                 c.let_("added_first").equals("add".call("a", "b"))
                 c.let_("added_twice").equals("add".call("added_first", "b"))
-                c.retur("added_twice")
+                c.return_("added_twice")
             })
             j.let_("added").equals("add_twice".call(5.0, 10.0))
             j.e("print".call("added"))
@@ -58,11 +58,11 @@ class JaneTests: XCTestCase {
         var context = CRBContext()
         try jane(in: &context, { (j) in
             
-            j.define.f("subtract").args("a", "b").build({ (f) in
+            j.def("subtract").args("a", "b").build({ (f) in
                 f.let_("second_minus").equals("negate".call("b"))
-                f.retur("add".call("a", "second_minus"))
+                f.return_("add".call("a", "second_minus"))
             })
-            j.retur("subtract".call(10.0, 5.0))
+            j.return_("subtract".call(10.0, 5.0))
             
         })
         let num = context.returningValue as! CRBNumberInstance
@@ -83,9 +83,9 @@ class JaneTests: XCTestCase {
         
         try jane(in: &context, { (j) in
             j.if_("equals".call(5.0, 5.0)).do_({ (c) in
-                c.retur(10.0)
+                c.return_(10.0)
             }).else_({ (c) in
-                c.retur(10.0)
+                c.return_(10.0)
             })
         })
         let num = context.returningValue as! CRBNumberInstance
