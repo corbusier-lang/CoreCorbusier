@@ -141,7 +141,7 @@ func testStatements() {
             var expectedContext = originalContext
             expectedContext.returningValue = inst
             
-            try expect((context.returningValue! as! CRBNumberInstance).value) == 10.0
+            try expect((context.returningValue as! CRBNumberInstance).value) == 10.0
             try expect(context) == expectedContext
         }
     }

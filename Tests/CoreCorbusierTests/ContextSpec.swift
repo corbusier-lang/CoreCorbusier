@@ -37,15 +37,15 @@ func testContext() {
             let context = CRBContext(scopes: Stack([scope1, scope2]))
             try expect(context.scopes.array) == [scope1, scope2]
         }
-        $0.it("have a nil returningValue on creation") {
+        $0.it("have a CRBNoReturnValue returningValue on creation") {
             let context = CRBContext()
-            try expect(context.returningValue).to.beNil()
+            try expect(context.returningValue.objectIdentifier()) == CRBNoReturnValue.shared.objectIdentifier()
         }
         $0.it("can change returning value") {
             var context = CRBContext()
             let inst = CRBNumberInstance(10.0)
             context.returningValue = inst
-            try expect(context.returningValue!.objectIdentifier()) == inst.objectIdentifier()
+            try expect(context.returningValue.objectIdentifier()) == inst.objectIdentifier()
         }
         $0.it("holds a reference to a top scope in a stack") {
             let scope1 = CRBScope(instances: [crbname("a"): CRBNumberInstance(10.0)])

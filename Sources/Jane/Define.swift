@@ -13,7 +13,14 @@ public final class JaneVoid : JaneExpression {
     }
 }
 
+public final class JaneNull : JaneExpression {
+    public func expression() -> CRBExpression {
+        return .instance(CRBNull.shared)
+    }
+}
+
 public let void = JaneVoid()
+public let null = JaneNull()
 
 extension JaneContext {
     

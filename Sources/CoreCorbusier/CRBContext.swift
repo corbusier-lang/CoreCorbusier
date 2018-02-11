@@ -47,7 +47,7 @@ public struct CRBScope {
 
 public struct CRBContext {
     
-    public var returningValue: CRBInstance?
+    public var returningValue: CRBInstance = CRBNoReturnValue.shared
     
     public init(instances: [CRBInstanceName : CRBInstance] = [:]) {
         let extLib = ExtLib.scope()
@@ -149,17 +149,11 @@ extension CRBScope : Equatable {
 extension CRBContext : Equatable {
     
     public static func == (lhs: CRBContext, rhs: CRBContext) -> Bool {
-        guard lhs.scopes.array == rhs.scopes.array else {
-            return false
-        }
-        switch (lhs.returningValue, rhs.returningValue) {
-        case (.none, .none):
-            return true
-        case (.some(let l), .some(let r)):
-            return l === r
-        default:
-            return false
-        }
+//        guard lhs.scopes.array == rhs.scopes.array else {
+//            return false
+//        }
+//        return
+        return lhs.scopes.array == rhs.scopes.array && lhs.returningValue === rhs.returningValue
     }
     
 }

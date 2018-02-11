@@ -7,6 +7,7 @@ class CoreCorbusierTests: XCTestCase {
         testContext()
         testExpressionEvaluator()
         testStatements()
+        testFunctions()
         let testResult = globalContext.run(reporter: StandardReporter())
         XCTAssertTrue(testResult)
     }

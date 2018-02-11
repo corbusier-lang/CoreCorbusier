@@ -65,7 +65,7 @@ class JaneTests: XCTestCase {
             j.retur("subtract".call(10.0, 5.0))
             
         })
-        let num = context.returningValue! as! CRBNumberInstance
+        let num = context.returningValue as! CRBNumberInstance
         XCTAssertEqual(num.value, 5.0)
         
     }

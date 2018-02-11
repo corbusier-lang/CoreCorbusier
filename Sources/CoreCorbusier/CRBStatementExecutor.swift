@@ -14,7 +14,7 @@ public struct CRBStatementExecutor {
     public init() { }
         
     public func execute(statement: CRBStatement, in context: inout CRBContext) throws {
-        guard context.returningValue == nil else {
+        guard context.returningValue === CRBNoReturnValue.shared else {
             print("No statements can be executed after return")
             return
         }

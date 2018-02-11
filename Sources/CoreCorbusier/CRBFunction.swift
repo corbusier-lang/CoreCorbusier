@@ -17,8 +17,6 @@ public class CRBFunction : CRBPlainInstance {
         throw Unimplemented()
     }
     
-    struct NoReturn : Error { }
-    
 }
 
 public class CRBFunctionInstance : CRBFunction {
@@ -37,10 +35,10 @@ public class CRBFunctionInstance : CRBFunction {
         self.init(argumentNames: argumentNames) { (context) -> CRBInstance in
             let ordered = CRBStatement.ordered(statements)
             try context.execute(statement: ordered)
-            if let returning = context.returningValue {
-                return returning
+            if context.returningValue === CRBNoReturnValue.shared {
+                return VoidInstance.shared
             }
-            throw NoReturn()
+            return context.returningValue
         }
     }
     

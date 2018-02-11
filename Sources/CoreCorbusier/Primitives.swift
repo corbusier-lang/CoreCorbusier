@@ -41,6 +41,14 @@ public final class CRBNull : CRBPlainInstance {
     
 }
 
+public final class CRBNoReturnValue : CRBPlainInstance {
+    
+    public static let shared = CRBNoReturnValue()
+    
+    private init() { }
+    
+}
+
 public final class CRBPointInstance : CRBStaticInstance {
     
     public let point: CRBPoint
