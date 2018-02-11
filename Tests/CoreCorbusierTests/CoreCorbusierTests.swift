@@ -1,5 +1,6 @@
 import XCTest
 import CoreCorbusier
+import Jane
 
 class CoreCorbusierTests: XCTestCase {
     
@@ -10,6 +11,24 @@ class CoreCorbusierTests: XCTestCase {
         testFunctions()
         let testResult = globalContext.run(reporter: StandardReporter())
         XCTAssertTrue(testResult)
+    }
+    
+    func testRecursion() throws {
+        
+        var context = CRBContext()
+        try jane(in: &context) { (j) in
+            j.def("recursive").args("a").build({ (f) in
+                f.if_("greater".call("a", 10.0)).do_({ d in
+                    d.let_("less").equals("add".call("a", "negate".call(1.0)))
+                    d.return_("recursive".call("less"))
+                }).else_({ d in
+                    d.return_("a")
+                })
+            })
+            j.return_("recursive".call(20.5))
+        }
+        dump(context.returningValue)
+        
     }
     
     func testCGRect() {

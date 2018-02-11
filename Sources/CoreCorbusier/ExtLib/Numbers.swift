@@ -11,6 +11,7 @@ public enum ExtLib {
         return CRBScope(instances: [
             crbname("add"): ExtLibNumbers.add,
             crbname("negate"): ExtLibNumbers.negate,
+            crbname("greater"): ExtLibNumbers.greater
         ])
     }
     
@@ -35,6 +36,13 @@ public enum ExtLibNumbers {
         return CRBExternalFunctionInstance({ (instances) -> CRBInstance in
             let num = try downcast(instances[0], to: CRBNumberInstance.self)
             return CRBNumberInstance(-num.value)
+        })
+    }
+    
+    public static var greater: CRBExternalFunctionInstance {
+        return CRBExternalFunctionInstance({ (instances) -> CRBInstance in
+            let (left, right) = try pair(from: instances)
+            return CRBBoolInstance(left.value > right.value)
         })
     }
     

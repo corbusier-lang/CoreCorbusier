@@ -24,14 +24,14 @@ public final class JaneCondition : JaneCommand {
         self.condition = condition
     }
     
-    func do_(_ block: @escaping (JaneContext) -> ()) {
+    public func do_(_ block: @escaping (JaneContext) -> ()) {
         let newContext = JaneContext()
         let statements = newContext.statements
         let ifStatement = CRBStatement.conditioned(if: condition.expression(), do: .ordered(statements), else: .ordered([]))
         context?.add(ifStatement)
     }
     
-    func do_(_ block: @escaping (JaneContext) -> ()) -> JaneIf {
+    public func do_(_ block: @escaping (JaneContext) -> ()) -> JaneIf {
         return pass({ JaneIf.init(condition: self, doBlock: block) })
     }
     
@@ -52,7 +52,7 @@ public final class JaneIf : JaneCommand {
         return new.statements
     }
     
-    func else_(_ elseBlock: @escaping (JaneContext) -> ()) {
+    public func else_(_ elseBlock: @escaping (JaneContext) -> ()) {
         let doStatements = statements(with: doBlock)
         let elseStatements = statements(with: elseBlock)
         let ifStatement = CRBStatement.conditioned(if: condition.condition.expression(), do: .ordered(doStatements), else: .ordered(elseStatements))
