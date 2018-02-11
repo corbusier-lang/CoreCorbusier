@@ -30,6 +30,12 @@ func testStatements() {
             try expect(stub.placeCall!.0) == point
             try expect(stub.placeCall!.1) == anchorName
         }
+        $0.it("throws if an instance is not an anchor") {
+            let notAnchor = CRBBoolInstance(true)
+            let place = CRBStatement.place(.instance(notAnchor))
+            var context = originalContext
+            try expect(try executor.execute(statement: place, in: &context)).toThrow()
+        }
         $0.it("throws if an anchor is unsupported") {
             let stub = Stub()
             stub.unsupportedAnchors = [crbpath("unsupported")]
