@@ -24,6 +24,12 @@ public struct Stack<T> {
         return array.popLast()
     }
     
+    public func popped() -> Stack<T> {
+        var copy = self
+        copy.pop()
+        return copy
+    }
+    
     public var top: T? {
         return array.last
     }

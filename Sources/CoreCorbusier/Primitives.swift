@@ -33,13 +33,21 @@ public final class VoidInstance : CRBPlainInstance {
     
 }
 
+public final class CRBNull : CRBPlainInstance {
+    
+    public static let shared = CRBNull()
+    
+    private init() { }
+    
+}
+
 public final class CRBPointInstance : CRBStaticInstance {
     
     public let point: CRBPoint
     
     public let values: [CRBPropertyName : CRBInstance]
     
-    init(point: CRBPoint) {
+    public init(point: CRBPoint) {
         self.point = point
         self.values = [
             crbname("x"): CRBNumberInstance(point.x),
@@ -47,4 +55,20 @@ public final class CRBPointInstance : CRBStaticInstance {
         ]
     }
     
+}
+
+public final class CRBVectorInstance : CRBStaticInstance {
+    
+    public let vector: CRBVector
+    
+    public let values: [CRBPropertyName : CRBInstance]
+    
+    public init(vector: CRBVector) {
+        self.vector = vector
+        self.values = [
+            crbname("dx"): CRBNumberInstance(vector.dx),
+            crbname("dy"): CRBNumberInstance(vector.dy)
+        ]
+    }
+ 
 }
